@@ -98,7 +98,7 @@ export default function EventDetailClient({ event }) {
                   <h5 className="mb-3">Guest Star</h5>
                   <div className="d-flex flex-wrap gap-3 mb-4">
                     {event.guest.map((guestName, index) => {
-                      const guest = guestOptions.find(g => g.label === guestName);
+                      const guest = guestOptions.find(g => g.name === guestName);
                       return guest ? (
                         <div
                           key={index}

@@ -60,7 +60,7 @@ export default function EventCard({ event }) {
                 <strong className="d-block mb-2">Guest Star:</strong>
                 <div className="d-flex flex-wrap gap-2">
                   {event.guest.map((guestName, index) => {
-                    const guest = guestOptions.find(g => g.label === guestName);
+                    const guest = guestOptions.find(g => g.name === guestName);
                     return guest ? (
                       <div
                         key={index}
