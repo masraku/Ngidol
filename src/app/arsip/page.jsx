@@ -24,17 +24,19 @@ export default function ArsipEvent() {
     fetchEvents();
   }, []);
 
+  // Cek apakah event sudah lebih dari 1 hari lewat
   const isPastEvent = (eventDateStr) => {
     const eventDate = new Date(eventDateStr);
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set today to midnight
+    today.setHours(0, 0, 0, 0); // Set today ke tengah malam
 
-    // Calculate the difference in days
+    // Hitung selisih waktu dalam hari
     const diffTime = Math.abs(today - eventDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convert ms to days
-    return diffDays > 1; // Only archive if event is at least 1 day past
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Ubah ms ke hari
+    return diffDays > 0; // Jika event sudah lebih dari 1 hari, baru masuk arsip
   };
 
+  // Filter event yang sudah lewat
   const archivedEvents = events.filter(event => isPastEvent(event.date));
 
   return (
