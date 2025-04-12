@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
 import { Calendar, Clock, GeoAlt, Star, ArrowLeft, Instagram } from 'react-bootstrap-icons';
+import guestOptions from '@/data/guestOptions'; // sesuaikan path jika beda
 
 export default function EventDetailClient({ event }) {
   const formatDate = (dateString) => {
@@ -88,7 +89,6 @@ export default function EventDetailClient({ event }) {
                         </div>
                       </div>
                     )}
-
                   </Col>
                 </Row>
               </div>
@@ -96,12 +96,28 @@ export default function EventDetailClient({ event }) {
               {Array.isArray(event.guest) && event.guest.length > 0 && (
                 <>
                   <h5 className="mb-3">Guest Star</h5>
-                  <div className="d-flex flex-wrap gap-2 mb-4">
-                    {event.guest.map((star, index) => (
-                      <Badge key={index} bg="light" text="dark" className="p-2">
-                        <Star className="me-1 text-warning" /> {star}
-                      </Badge>
-                    ))}
+                  <div className="d-flex flex-wrap gap-3 mb-4">
+                    {event.guest.map((guestName, index) => {
+                      const guest = guestOptions.find(g => g.label === guestName);
+                      return guest ? (
+                        <div
+                          key={index}
+                          className="text-center"
+                          style={{ width: 80 }}
+                        >
+                          <Image
+                            src={guest.image}
+                            alt={guest.label}
+                            width={60}
+                            height={60}
+                            className="rounded-circle border border-secondary shadow-sm"
+                          />
+                          <div className="mt-2 small">{guest.label}</div>
+                        </div>
+                      ) : (
+                        <Badge key={index} bg="secondary">{guestName}</Badge>
+                      );
+                    })}
                   </div>
                 </>
               )}

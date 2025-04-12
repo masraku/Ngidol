@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { Card, Badge, Row, Col, Button, Image } from 'react-bootstrap';
-import { Calendar, Clock, GeoAlt, Star } from 'react-bootstrap-icons';
-import { useAuth } from '@/app/context/AuthContext'; // asumsi path context-nya ini
+import { Calendar, Clock, GeoAlt } from 'react-bootstrap-icons';
+import { useAuth } from '@/app/context/AuthContext'; // sesuaikan path
+import guestOptions from '@/data/guestOptions'; // sesuaikan path
 
 export default function EventCard({ event }) {
-  const { user } = useAuth(); // Ambil user dari context
+  const { user } = useAuth();
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -54,10 +55,34 @@ export default function EventCard({ event }) {
               <span>{event.location}</span>
             </div>
 
-            <div className="d-flex align-items-center mb-3">
-              <Star className="me-2" />
-              <span><strong>Guest Star:</strong> {event.guest?.join(', ')}</span>
-            </div>
+            {Array.isArray(event.guest) && event.guest.length > 0 && (
+              <div className="mb-3">
+                <strong className="d-block mb-2">Guest Star:</strong>
+                <div className="d-flex flex-wrap gap-2">
+                  {event.guest.map((guestName, index) => {
+                    const guest = guestOptions.find(g => g.label === guestName);
+                    return guest ? (
+                      <div
+                        key={index}
+                        className="text-center"
+                        style={{ width: 60 }}
+                      >
+                        <Image
+                          src={guest.image}
+                          alt={guest.label}
+                          width={40}
+                          height={40}
+                          className="rounded-circle border border-secondary shadow-sm"
+                        />
+                        <div className="small mt-1">{guest.label}</div>
+                      </div>
+                    ) : (
+                      <Badge key={index} bg="secondary">{guestName}</Badge>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             <Button as={Link} href={`/event/${event.id}`} variant="outline-primary" className="me-2">
               Lihat Detail

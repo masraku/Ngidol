@@ -67,6 +67,18 @@ export const guestOptions = [
       name: 'Kalopsia',
       image: '/assets/kalopsia.jpeg',
     },
+    {
+      name: 'Eighteens +',
+      image: '/assets/18+.jpeg',
+    },
+    {
+      name: 'Kirari',
+      image: '/assets/kirari.jpeg',
+    },
+    {
+      name: 'Amai Monogatari',
+      image: '/assets/amai.jpeg',
+    },
     
     // Tambahkan lainnya...
   ];
