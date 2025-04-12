@@ -1,0 +1,102 @@
+'use client';
+
+import Link from 'next/link';
+import Image from 'next/image';
+import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
+import { Calendar, Clock, GeoAlt, Star, ArrowLeft } from 'react-bootstrap-icons';
+
+export default function EventDetailClient({ event }) {
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('id-ID', options);
+  };
+
+  return (
+    <Container className="py-5">
+      <Row className="mb-4">
+        <Col>
+          <Button 
+            as={Link}
+            href="/"
+            variant="outline-secondary" 
+            className="d-flex align-items-center"
+          >
+            <ArrowLeft className="me-2" /> Kembali ke daftar event
+          </Button>
+        </Col>
+      </Row>
+      
+      <Row>
+        <Col lg={8}>
+          <Card className="shadow-sm border-0 mb-4">
+            <Card.Body>
+              <h1 className="mb-3">{event.name}</h1>
+              <Badge bg="primary" className="mb-4">{event.category}</Badge>
+
+              {event.photos?.[0] && (
+                <div className="mb-4">
+                  <Image
+                    src={event.photos[0]}
+                    alt={event.name}
+                    width={800}
+                    height={400}
+                    className="img-fluid rounded"
+                  />
+                </div>
+              )}
+              
+              <div className="bg-light p-4 rounded mb-4">
+                <Row>
+                  <Col md={6} className="mb-3 mb-md-0">
+                    <div className="d-flex align-items-center mb-3">
+                      <Calendar className="me-2 text-primary" />
+                      <div>
+                        <small className="text-muted d-block">Tanggal</small>
+                        <strong>{formatDate(event.date)}</strong>
+                      </div>
+                    </div>
+                    
+                    <div className="d-flex align-items-center">
+                      <Clock className="me-2 text-primary" />
+                      <div>
+                        <small className="text-muted d-block">Waktu</small>
+                        <strong>{event.time}</strong>
+                      </div>
+                    </div>
+                  </Col>
+                  
+                  <Col md={6}>
+                    <div className="d-flex align-items-center">
+                      <GeoAlt className="me-2 text-primary" />
+                      <div>
+                        <small className="text-muted d-block">Lokasi</small>
+                        <strong>{event.location}</strong>
+                      </div>
+                    </div>
+                  </Col>
+                </Row>
+              </div>
+
+              {Array.isArray(event.guest) && event.guest.length > 0 && (
+                <>
+                  <h5 className="mb-3">Guest Star</h5>
+                  <div className="d-flex flex-wrap gap-2 mb-4">
+                    {event.guest.map((star, index) => (
+                      <Badge key={index} bg="light" text="dark" className="p-2">
+                        <Star className="me-1 text-warning" /> {star}
+                      </Badge>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              <h5 className="mb-3">Harga Tiket</h5>
+              <p className="fs-5 fw-bold">{event.htm}</p>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
+  );
+}
