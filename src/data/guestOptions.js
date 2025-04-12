@@ -47,6 +47,11 @@ export const guestOptions = [
       name: 'Cherry Wish',
       image: '/assets/cherrywish.jpg',
     },
+    {
+      name: 'Nextanative',
+      image: '/assets/nexta.jpg',
+    },
+    
     // Tambahkan lainnya...
   ];
   
