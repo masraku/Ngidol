@@ -7,7 +7,7 @@ export default function AboutClient() {
     <Container className="py-5">
       <Row className="justify-content-center">
         <Col md={8}>
-          <h1 className="mb-4 text-center">Tentang EventKu</h1>
+          <h1 className="mb-4 text-center">Tentang Mikseru</h1>
           
           <Card className="shadow-sm border-0 mb-4">
             <Card.Body className="p-4">
