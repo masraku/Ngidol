@@ -55,6 +55,14 @@ export const guestOptions = [
       name: 'Shoujo Complex',
       image: '/assets/shocom.jpg',
     },
+    {
+      name: 'Aozora Belt',
+      image: '/assets/aozora.jpeg',
+    },
+    {
+      name: 'Tomoshibi',
+      image: '/assets/tomoshibi.jpeg',
+    },
     
     // Tambahkan lainnya...
   ];

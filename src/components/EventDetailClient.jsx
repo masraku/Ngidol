@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
-import { Calendar, Clock, GeoAlt, Star, ArrowLeft } from 'react-bootstrap-icons';
+import { Calendar, Clock, GeoAlt, Star, ArrowLeft, Instagram } from 'react-bootstrap-icons';
 
 export default function EventDetailClient({ event }) {
   const formatDate = (dateString) => {
@@ -16,17 +16,17 @@ export default function EventDetailClient({ event }) {
     <Container className="py-5">
       <Row className="mb-4">
         <Col>
-          <Button 
+          <Button
             as={Link}
             href="/"
-            variant="outline-secondary" 
+            variant="outline-secondary"
             className="d-flex align-items-center"
           >
             <ArrowLeft className="me-2" /> Kembali ke daftar event
           </Button>
         </Col>
       </Row>
-      
+
       <Row>
         <Col lg={8}>
           <Card className="shadow-sm border-0 mb-4">
@@ -45,7 +45,7 @@ export default function EventDetailClient({ event }) {
                   />
                 </div>
               )}
-              
+
               <div className="bg-light p-4 rounded mb-4">
                 <Row>
                   <Col md={6} className="mb-3 mb-md-0">
@@ -56,7 +56,7 @@ export default function EventDetailClient({ event }) {
                         <strong>{formatDate(event.date)}</strong>
                       </div>
                     </div>
-                    
+
                     <div className="d-flex align-items-center">
                       <Clock className="me-2 text-primary" />
                       <div>
@@ -65,7 +65,7 @@ export default function EventDetailClient({ event }) {
                       </div>
                     </div>
                   </Col>
-                  
+
                   <Col md={6}>
                     <div className="d-flex align-items-center">
                       <GeoAlt className="me-2 text-primary" />
@@ -74,6 +74,19 @@ export default function EventDetailClient({ event }) {
                         <strong>{event.location}</strong>
                       </div>
                     </div>
+
+                    {event.link && (
+                      <div className='d-flex align-items-center mt-3'>
+                        <Instagram className='me-2 text-primary' />
+                        <div>
+                          <small className="text-muted d-block">Instagram</small>
+                          <Link href={event.link} target="_blank" className="text-decoration-none text-primary">
+                            <strong>{event.link || '-'}</strong>
+                          </Link>
+                        </div>
+                      </div>
+                    )}
+
                   </Col>
                 </Row>
               </div>

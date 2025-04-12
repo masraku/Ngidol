@@ -11,6 +11,7 @@ const Event = () => {
         date: '',
         time: '',
         location: '',
+        link: '',
         guest: [],
         category: 'Pilih Kategori',
         htm: '',
@@ -67,6 +68,7 @@ const Event = () => {
         formData.append('date', form.date);
         formData.append('time', form.time);
         formData.append('location', form.location);
+        formData.append('link', form.link);
         formData.append('guest', JSON.stringify(form.guest));
         formData.append('category', form.category);
         formData.append('htm', form.htm);
@@ -119,6 +121,11 @@ const Event = () => {
                                 <Form.Group className="mb-3">
                                     <Form.Label>Lokasi Event</Form.Label>
                                     <Form.Control type="text" name="location" value={form.location} onChange={handleChange} />
+                                </Form.Group>
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Link Event</Form.Label>
+                                    <Form.Control type="text" name="link" value={form.link} onChange={handleChange} />
                                 </Form.Group>
 
                                 <Form.Group className="mb-3">

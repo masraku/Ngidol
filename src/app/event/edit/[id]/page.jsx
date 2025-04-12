@@ -155,6 +155,15 @@ export default function EditEventPage() {
                 onChange={handleChange}
               />
             </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Link</Form.Label>
+              <Form.Control
+                name="link"
+                value={eventData.link}
+                onChange={handleChange}
+              />
+            </Form.Group>
           </Col>
 
           <Col md={6}>

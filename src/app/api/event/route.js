@@ -5,13 +5,13 @@ import { supabase } from '@/lib/supabase';
 export async function POST(req) {
     try {
         const formData = await req.formData();
-
         const name = formData.get('name');
         const date = formData.get('date');
         const time = formData.get('time');
         const location = formData.get('location');
         const guestRaw = formData.get('guest');
         const category = formData.get('category');
+        const link = formData.get('link');
         const htm = formData.get('htm');
         const photos = formData.getAll('photos');
 
@@ -65,14 +65,15 @@ export async function POST(req) {
             uploadedPhotos.push(urlData.publicUrl);
         }
 
-        const newEvent = await prisma.event.create({
+        const newEvent = await prisma.Event.create({
             data: {
                 name,
-                date: new Date(date),
+                date,
                 time,
                 location,
                 guest,
-                category: {
+                link,
+                Category: {
                     connect: { id: foundCategory.id }
                 },
                 htm,
@@ -92,7 +93,7 @@ export async function POST(req) {
 
 export async function GET() {
     try {
-        const events = await prisma.event.findMany({
+        const events = await prisma.Event.findMany({
             orderBy: { date: 'asc' },
         });
 

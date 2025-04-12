@@ -9,8 +9,9 @@ export async function GET(req, { params }) {
   }
 
   try {
-    const event = await prisma.event.findUnique({
-      where: { id },
+    const event = await prisma.Event.findUnique({
+      where: { id: parseInt(params.id) },
+      include: { Category: true },
     });
 
     if (!event) {
@@ -36,6 +37,7 @@ export async function PUT(req, { params }) {
       time: body.time,
       location: body.location,
       htm: body.htm,
+      link: body.link,
       guest: body.guest,
       photos: body.photos,
     };
@@ -46,7 +48,7 @@ export async function PUT(req, { params }) {
       };
     }
     
-    const updatedEvent = await prisma.event.update({
+    const updatedEvent = await prisma.Event.update({
       where: { id: parseInt(id) },
       data: updateData,
     });

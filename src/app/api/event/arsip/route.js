@@ -3,7 +3,7 @@ import prisma from '@/lib/prisma'; // pastikan path prisma kamu sesuai
 
 export async function GET() {
   try {
-    const allEvents = await prisma.event.findMany({
+    const allEvents = await prisma.Event.findMany({
       orderBy: { date: 'desc' }, // urutkan agar yang paling baru di atas
     });
 
