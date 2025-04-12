@@ -9,7 +9,7 @@ export const guestOptions = [
     },
     {
       name: 'Victory',
-      image: '/assets/victory.jpg',
+      image: '/assets/victory.jpeg',
     },
     {
       name: 'JKT48',
@@ -49,7 +49,7 @@ export const guestOptions = [
     },
     {
       name: 'Nextanative',
-      image: '/assets/nexta.jpg',
+      image: '/assets/nexta.jpeg',
     },
     {
       name: 'Shoujo Complex',
@@ -82,6 +82,26 @@ export const guestOptions = [
     {
       name: 'Lemon',
       image: '/assets/lemon.jpeg',
+    },
+    {
+      name: 'Magic Koi',
+      image: '/assets/magickoi.jpeg',
+    },
+    {
+      name: 'Kirin Day',
+      image: '/assets/kirin.jpeg',
+    },
+    {
+      name: 'Summer Time',
+      image: '/assets/summer.jpeg',
+    },
+    {
+      name: 'Eclipse',
+      image: '/assets/eclipse.jpeg',
+    },
+    {
+      name: 'Idolize',
+      image: '/assets/idolize.jpeg',
     },
     
     // Tambahkan lainnya...
