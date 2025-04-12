@@ -57,7 +57,7 @@ const Event = () => {
         setError(null);
         setSuccess(false);
 
-        if (!form.name || !form.date || !form.guest.length) {
+        if (!form.name || !form.guest.length) {
             setError("Lengkapi semua field sebelum submit");
             setLoading(false);
             return;
