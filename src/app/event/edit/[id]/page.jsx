@@ -6,6 +6,7 @@ import GuestSelector from '@/components/GuestSelector';
 import { Form, Button, Spinner, Container, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 import { supabase } from '@/lib/supabase';
+import DatePicker from "react-multi-date-picker"; // Import DatePicker
 
 export default function EditEventPage() {
   const { id } = useParams();
@@ -54,6 +55,19 @@ export default function EditEventPage() {
       photos: prev.photos.filter((_, i) => i !== index),
     }));
   };
+
+  const handleDateChange = (dates) => {
+    setEventData((prev) => ({
+      ...prev,
+      date: dates ? dates.map((date) => {
+        const validDate = new Date(date);
+        return isNaN(validDate.getTime()) ? null : validDate.toISOString(); // Ensure valid ISO string
+      }).filter(date => date !== null) : [], // Remove invalid dates
+    }));
+  };
+
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -128,13 +142,13 @@ export default function EditEventPage() {
 
             <Form.Group className="mb-3">
               <Form.Label>Tanggal</Form.Label>
-              <Form.Control
-                type="date"
-                name="date"
-                value={eventData.date.slice(0, 10)}
-                onChange={handleChange}
-                required
+              <DatePicker
+                value={eventData.date.map(date => new Date(date).toISOString())}
+                onChange={handleDateChange}
+                multiple
+                format="YYYY-MM-DD"
               />
+
             </Form.Group>
 
             <Form.Group className="mb-3">

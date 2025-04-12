@@ -9,10 +9,21 @@ import { guestOptions } from '@/data/guestOptions';
 export default function EventCard({ event }) {
   const { user } = useAuth();
 
+  // Format date as string
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     return date.toLocaleDateString('id-ID', options);
+  };
+
+  // Calculate the event duration
+  const getEventDuration = (dates) => {
+    const startDate = new Date(dates[0]);
+    const endDate = new Date(dates[dates.length - 1]);
+
+    const diffTime = Math.abs(endDate - startDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end day
+    return diffDays;
   };
 
   return (
@@ -21,8 +32,9 @@ export default function EventCard({ event }) {
         <Row>
           <Col md={3} className="mb-3 mb-md-0 text-center">
             <div className="p-3 bg-primary text-white rounded mb-3">
-              <h3>{new Date(event.date).getDate()}</h3>
-              <p className="mb-0">{formatDate(event.date).split(',')[1]}</p>
+              <h3>{new Date(event.date[0]).getDate()}</h3>
+              <p className="mb-0">{formatDate(event.date[0]).split(',')[1]}</p>
+              <p className="mb-0">({getEventDuration(event.date)} Hari)</p> {/* Show event duration */}
             </div>
 
             {event.photos && event.photos.length > 0 && (
@@ -40,9 +52,10 @@ export default function EventCard({ event }) {
             <h4 className="mb-2">{event.name}</h4>
             <Badge bg="secondary" className="mb-3">{event.category}</Badge>
 
+            {/* Display all event dates */}
             <div className="d-flex align-items-center mb-2">
               <Calendar className="me-2" />
-              <span>{formatDate(event.date.map(d => formatDate(d)))}</span>
+              <span>{event.date.map(d => formatDate(d)).join(' & ')}</span> {/* Join all dates with ' & ' */}
             </div>
 
             <div className="d-flex align-items-center mb-2">

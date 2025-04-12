@@ -3,14 +3,25 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
-import { Calendar, Clock, GeoAlt, Star, ArrowLeft, Instagram } from 'react-bootstrap-icons';
+import { Calendar, Clock, GeoAlt, Instagram, ArrowLeft } from 'react-bootstrap-icons';
 import { guestOptions } from '@/data/guestOptions';
 
 export default function EventDetailClient({ event }) {
+  // Format date as string
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     return date.toLocaleDateString('id-ID', options);
+  };
+
+  // Calculate the event duration
+  const getEventDuration = (dates) => {
+    const startDate = new Date(dates[0]);
+    const endDate = new Date(dates[dates.length - 1]);
+
+    const diffTime = Math.abs(endDate - startDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end day
+    return diffDays;
   };
 
   return (
@@ -54,7 +65,8 @@ export default function EventDetailClient({ event }) {
                       <Calendar className="me-2 text-primary" />
                       <div>
                         <small className="text-muted d-block">Tanggal</small>
-                        <strong>{formatDate(event.date.map(d => formatDate(d)))}</strong>
+                        <strong>{event.date.map(d => formatDate(d)).join(' & ')}</strong> {/* Join all dates */}
+                        <p className="mb-0">({getEventDuration(event.date)} Hari)</p> {/* Show event duration */}
                       </div>
                     </div>
 
