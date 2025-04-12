@@ -13,8 +13,8 @@ export default function AboutClient() {
             <Card.Body className="p-4">
               <h3 className="mb-3">Siapa Kami</h3>
               <p>
-                EventKu adalah platform terdepan untuk menemukan dan mengikuti berbagai event menarik 
-                di seluruh Indonesia. Kami berkomitmen untuk menghubungkan penyelenggara event dengan 
+                Mikseru Event adalah platform terdepan untuk menemukan dan mengikuti berbagai event Chika Idol menarik 
+                di Jakarta. Management kami berkomitmen untuk menghubungkan penyelenggara event dengan 
                 para pengunjung yang mencari pengalaman baru dan menarik.
               </p>
               
@@ -41,9 +41,8 @@ export default function AboutClient() {
                 kami di:
               </p>
               <p>
-                <strong>Email:</strong> info@eventku.com<br />
-                <strong>Telepon:</strong> +62 21 1234567<br />
-                <strong>Alamat:</strong> Jl. Sudirman No. 123, Jakarta
+                <strong>Email:</strong> laksmanarakho@gmail.com<br />
+                <strong>Alamat:</strong> WPK, Kantin Kuningan, 12, RT.12/RW.1, Kuningan, Kuningan Tim., Kecamatan Setiabudi, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12950
               </p>
             </Card.Body>
           </Card>

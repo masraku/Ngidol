@@ -1,25 +1,26 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import GuestSelector from '@/components/GuestSelector';
 
 const Event = () => {
-    const [form, setForm] = useState({
+    const initialForm = {
         name: '',
         date: '',
         time: '',
         location: '',
-        guest: [], // ini udah aman
+        guest: [],
         category: 'Pilih Kategori',
         htm: '',
         photos: [],
-    });
+    };
 
-
+    const [form, setForm] = useState(initialForm);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(false);
     const fileInputRef = useRef(null);
 
     const handleChange = (e) => {
@@ -39,13 +40,14 @@ const Event = () => {
         e.preventDefault();
         setLoading(true);
         setError(null);
-      
+        setSuccess(false);
+
         if (!form.name || !form.date || !form.guest.length) {
-          setError("Lengkapi semua field sebelum submit");
-          setLoading(false);
-          return;
+            setError("Lengkapi semua field sebelum submit");
+            setLoading(false);
+            return;
         }
-      
+
         const formData = new FormData();
         formData.append('name', form.name);
         formData.append('date', form.date);
@@ -55,22 +57,24 @@ const Event = () => {
         formData.append('category', form.category);
         formData.append('htm', form.htm);
         for (const file of form.photos) {
-          formData.append('photos', file);
+            formData.append('photos', file);
         }
-      
+
         try {
-          const res = await axios.post('/api/event', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-          });
-      
-          // reset
+            const res = await axios.post('/api/event', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            setSuccess(true);
+            setForm(initialForm);
+            if (fileInputRef.current) fileInputRef.current.value = ''; // clear file input
         } catch (error) {
-          setError(error.response?.data?.message || error.message);
+            setError(error.response?.data?.message || error.message);
         } finally {
-          setLoading(false);
+            setLoading(false);
         }
-      };
-      
+    };
+
     return (
         <Container fluid className="py-5 bg-light">
             <Row>
@@ -83,6 +87,8 @@ const Event = () => {
                 <Col md={8} className="mx-auto">
                     <Card className="shadow-sm">
                         <Card.Body>
+                            {error && <Alert variant="danger">{error}</Alert>}
+                            {success && <Alert variant="success">Event berhasil ditambahkan!</Alert>}
                             <Form onSubmit={handleSubmit}>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Nama Event</Form.Label>
@@ -101,7 +107,6 @@ const Event = () => {
                                     <Form.Control type="text" name="location" value={form.location} onChange={handleChange} />
                                 </Form.Group>
 
-                                {/* Ganti dengan GuestSelector */}
                                 <Form.Group className="mb-3">
                                     <Form.Label>Guest Star</Form.Label>
                                     <GuestSelector
@@ -110,8 +115,6 @@ const Event = () => {
                                             setForm((prev) => ({ ...prev, guest: guestList }))
                                         }
                                     />
-
-
                                 </Form.Group>
 
                                 <Form.Group className="mb-3">
@@ -136,7 +139,6 @@ const Event = () => {
                                         multiple
                                         ref={fileInputRef}
                                     />
-                                    {error && <div className="text-danger mt-2">{error}</div>}
                                 </Form.Group>
                                 <Button type="submit" variant="primary" disabled={loading}>
                                     {loading ? 'Menyimpan...' : 'Tambah Event'}
