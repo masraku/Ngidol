@@ -17,7 +17,7 @@ datasource db {
 model Event {
   id         Int       @id @default(autoincrement())
   name       String
-  date       String
+  date       DateTime[]
   time       String
   location   String
   guest      String[]

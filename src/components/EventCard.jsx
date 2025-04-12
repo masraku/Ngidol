@@ -42,7 +42,7 @@ export default function EventCard({ event }) {
 
             <div className="d-flex align-items-center mb-2">
               <Calendar className="me-2" />
-              <span>{formatDate(event.date)}</span>
+              <span>{formatDate(event.date.map(d => formatDate(d)))}</span>
             </div>
 
             <div className="d-flex align-items-center mb-2">

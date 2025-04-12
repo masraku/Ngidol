@@ -3,12 +3,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
 import axios from 'axios';
+import DatePicker from "react-multi-date-picker";
 import GuestSelector from '@/components/GuestSelector';
 
 const Event = () => {
     const initialForm = {
         name: '',
-        date: '',
+        date: [],
         time: '',
         location: '',
         link: '',
@@ -34,7 +35,7 @@ const Event = () => {
                 console.error('Gagal mengambil kategori:', error);
             }
         };
-    
+
         fetchCategories();
     }, []);
 
@@ -65,7 +66,7 @@ const Event = () => {
 
         const formData = new FormData();
         formData.append('name', form.name);
-        formData.append('date', form.date);
+        formData.append('date', JSON.stringify(form.date));
         formData.append('time', form.time);
         formData.append('location', form.location);
         formData.append('link', form.link);
@@ -112,7 +113,15 @@ const Event = () => {
                                 </Form.Group>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Tanggal Event</Form.Label>
-                                    <Form.Control type="date" name="date" value={form.date} onChange={handleChange} />
+                                    <DatePicker
+                                        multiple
+                                        value={form.date}
+                                        onChange={(dates) =>
+                                            setForm((prev) => ({ ...prev, date: dates.map(d => d.toDate()) }))
+                                        }
+                                        format="DD MMMM YYYY"
+                                        className="w-100"
+                                    />
                                 </Form.Group>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Waktu Event</Form.Label>

@@ -54,7 +54,7 @@ export default function EventDetailClient({ event }) {
                       <Calendar className="me-2 text-primary" />
                       <div>
                         <small className="text-muted d-block">Tanggal</small>
-                        <strong>{formatDate(event.date)}</strong>
+                        <strong>{formatDate(event.date.map(d => formatDate(d)))}</strong>
                       </div>
                     </div>
 

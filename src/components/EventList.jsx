@@ -31,32 +31,44 @@ export default function EventList() {
   // Ambil semua kategori unik dari data event
   const uniqueCategories = Array.from(new Set(events.map(event => event.Category?.name)));
   const categories = ['Semua', ...uniqueCategories];
-  const isEventUpcoming = (eventDateStr) => {
-    const eventDate = new Date(eventDateStr);
+
+  const isEventUpcoming = (dateData) => {
     const today = new Date();
-    // Set jam ke 00:00 agar hanya bandingkan tanggal
-    eventDate.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);
-    return eventDate >= today;
+
+    // Kalau date kosong, anggap eventnya bakal datang
+    if (!dateData || dateData.length === 0) {
+      return true;
+    }
+
+    if (Array.isArray(dateData)) {
+      return dateData.some(dateStr => {
+        const d = new Date(dateStr);
+        d.setHours(0, 0, 0, 0);
+        return d >= today;
+      });
+    } else {
+      const d = new Date(dateData);
+      d.setHours(0, 0, 0, 0);
+      return d >= today;
+    }
   };
-  
+
 
   // Filter event berdasarkan search dan kategori
   const filteredEvents = events
-  .filter(event => isEventUpcoming(event.date)) // hanya event yang belum lewat
-  .filter(event => {
-    const matchesSearch =
-      event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (event.guest?.join(', ').toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
+    .filter(event => isEventUpcoming(event.date)) // hanya event yang belum lewat
+    .filter(event => {
+      const matchesSearch =
+        event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (event.guest?.join(', ').toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
 
       const matchesCategory =
-      selectedCategory === 'Semua' || event.Category?.name === selectedCategory;    
+        selectedCategory === 'Semua' || event.Category?.name === selectedCategory;
 
-    return matchesSearch && matchesCategory;
-  });
-
-
+      return matchesSearch && matchesCategory;
+    });
 
   return (
     <Container fluid className="py-5 bg-light">

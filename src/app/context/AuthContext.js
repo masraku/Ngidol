@@ -9,26 +9,31 @@ export function AuthProvider({ children }) {
 
     const fetchUser = async () => {
         try {
-            const res = await fetch('/api/auth', { credentials: 'include' });
+            const res = await fetch('/api/auth', {
+                credentials: 'include', // penting agar cookie keikut
+            });
             const data = await res.json();
-            if (data.success) {
-                setUser(data.admin);
+
+            if (res.ok) {
+                setUser(data.admin); // sesuaikan dengan response API kamu
             } else {
                 setUser(null);
             }
         } catch (err) {
+            console.error('fetchUser error:', err);
             setUser(null);
         }
     };
+
     useEffect(() => {
         fetchUser();
     }, []);
 
-    return(
+    return (
         <AuthContext.Provider value={{ user, setUser, fetchUser }}>
             {children}
         </AuthContext.Provider>
-    )
+    );
 }
 
 export function useAuth() {
