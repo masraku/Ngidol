@@ -81,7 +81,9 @@ export default function EventDetailClient({ event }) {
                         <div>
                           <small className="text-muted d-block">Instagram</small>
                           <Link href={event.link} target="_blank" className="text-decoration-none text-primary">
-                            <strong>{event.link || '-'}</strong>
+                            <strong>
+                              {new URL(event.link).hostname + new URL(event.link).pathname.slice(0, 15) + '...'}
+                            </strong>
                           </Link>
                         </div>
                       </div>

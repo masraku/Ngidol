@@ -95,6 +95,9 @@ export async function GET() {
     try {
         const events = await prisma.Event.findMany({
             orderBy: { date: 'asc' },
+            include: {
+                Category: true,
+            },
         });
 
         return NextResponse.json(events);

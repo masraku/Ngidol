@@ -29,7 +29,7 @@ export default function EventList() {
   }, []);
 
   // Ambil semua kategori unik dari data event
-  const uniqueCategories = Array.from(new Set(events.map(event => event.category)));
+  const uniqueCategories = Array.from(new Set(events.map(event => event.Category?.name)));
   const categories = ['Semua', ...uniqueCategories];
   const isEventUpcoming = (eventDateStr) => {
     const eventDate = new Date(eventDateStr);
@@ -50,8 +50,8 @@ export default function EventList() {
       event.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (event.guest?.join(', ').toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
 
-    const matchesCategory =
-      selectedCategory === 'Semua' || event.category === selectedCategory;
+      const matchesCategory =
+      selectedCategory === 'Semua' || event.Category?.name === selectedCategory;    
 
     return matchesSearch && matchesCategory;
   });

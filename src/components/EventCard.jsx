@@ -3,9 +3,11 @@
 import Link from 'next/link';
 import { Card, Badge, Row, Col, Button, Image } from 'react-bootstrap';
 import { Calendar, Clock, GeoAlt, Star } from 'react-bootstrap-icons';
+import { useAuth } from '@/app/context/AuthContext'; // asumsi path context-nya ini
 
 export default function EventCard({ event }) {
-  // Format tanggal menjadi lebih mudah dibaca
+  const { user } = useAuth(); // Ambil user dari context
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -24,7 +26,7 @@ export default function EventCard({ event }) {
 
             {event.photos && event.photos.length > 0 && (
               <Image
-                src={event.photos[0]} // ambil foto pertama
+                src={event.photos[0]}
                 alt={event.name}
                 fluid
                 rounded
@@ -57,13 +59,15 @@ export default function EventCard({ event }) {
               <span><strong>Guest Star:</strong> {event.guest?.join(', ')}</span>
             </div>
 
-            <Button as={Link} href={`/event/${event.id}`} variant="outline-primary">
+            <Button as={Link} href={`/event/${event.id}`} variant="outline-primary" className="me-2">
               Lihat Detail
             </Button>
 
-            <Button as={Link} href={`/event/edit/${event.id}`} variant="outline-primary">
-              Edit Event
-            </Button>
+            {user && (
+              <Button as={Link} href={`/event/edit/${event.id}`} variant="outline-warning">
+                Edit Event
+              </Button>
+            )}
           </Col>
         </Row>
       </Card.Body>
