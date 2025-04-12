@@ -43,6 +43,10 @@ export const guestOptions = [
       name: 'Akemi',
       image: '/assets/akemi.jpg',
     },
+    {
+      name: 'Cherry Wish',
+      image: '/assets/cherrywish.jpg',
+    },
     // Tambahkan lainnya...
   ];
   
