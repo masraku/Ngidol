@@ -79,6 +79,10 @@ export const guestOptions = [
       name: 'Amai Monogatari',
       image: '/assets/amai.jpeg',
     },
+    {
+      name: 'Lemon',
+      image: '/assets/lemon.jpeg',
+    },
     
     // Tambahkan lainnya...
   ];

@@ -112,7 +112,7 @@ export default function EventDetailClient({ event }) {
                             height={60}
                             className="rounded-circle border border-secondary shadow-sm"
                           />
-                          <div className="mt-2 small">{guest.label}</div>
+                          <div className="mt-2 small">{guest.name}</div>
                         </div>
                       ) : (
                         <Badge key={index} bg="secondary">{guestName}</Badge>
