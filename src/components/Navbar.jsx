@@ -23,7 +23,7 @@ export default function NavbarComponent() {
   return (
     <Navbar bg="dark" variant="dark" expand="lg" sticky="top" className="shadow-sm">
       <Container>
-        <Navbar.Brand as={Link} href="/">Event Mikseru</Navbar.Brand>
+        <Navbar.Brand as={Link} href="/">EventKu by Mikseru</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
