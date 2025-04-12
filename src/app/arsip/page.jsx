@@ -27,9 +27,12 @@ export default function ArsipEvent() {
   const isPastEvent = (eventDateStr) => {
     const eventDate = new Date(eventDateStr);
     const today = new Date();
-    eventDate.setHours(0, 0, 0, 0);
-    today.setHours(0, 0, 0, 0);
-    return eventDate < today;
+    today.setHours(0, 0, 0, 0); // Set today to midnight
+
+    // Calculate the difference in days
+    const diffTime = Math.abs(today - eventDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convert ms to days
+    return diffDays > 1; // Only archive if event is at least 1 day past
   };
 
   const archivedEvents = events.filter(event => isPastEvent(event.date));
