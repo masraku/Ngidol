@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import GuestSelector from '@/components/GuestSelector';
@@ -17,11 +17,25 @@ const Event = () => {
         photos: [],
     };
 
+    const [categories, setCategories] = useState([]);
     const [form, setForm] = useState(initialForm);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
     const fileInputRef = useRef(null);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await axios.get('/api/event/category');
+                setCategories(res.data); // pastikan API-nya mengembalikan array objek kategori
+            } catch (error) {
+                console.error('Gagal mengambil kategori:', error);
+            }
+        };
+    
+        fetchCategories();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
@@ -121,11 +135,12 @@ const Event = () => {
                                     <Form.Label>Kategori</Form.Label>
                                     <Form.Select name="category" value={form.category} onChange={handleChange}>
                                         <option value="">Pilih Kategori</option>
-                                        <option value="Semua">Semua</option>
-                                        <option value="Chika Idol">Chika Idol</option>
-                                        <option value="JKT48">JKT48</option>
+                                        {categories.map((cat) => (
+                                            <option key={cat.id} value={cat.name}>{cat.name}</option>
+                                        ))}
                                     </Form.Select>
                                 </Form.Group>
+
                                 <Form.Group className="mb-3">
                                     <Form.Label>HTM</Form.Label>
                                     <Form.Control type="text" name="htm" value={form.htm} onChange={handleChange} />

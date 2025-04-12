@@ -60,6 +60,10 @@ export default function EventCard({ event }) {
             <Button as={Link} href={`/event/${event.id}`} variant="outline-primary">
               Lihat Detail
             </Button>
+
+            <Button as={Link} href={`/event/edit/${event.id}`} variant="outline-primary">
+              Edit Event
+            </Button>
           </Col>
         </Row>
       </Card.Body>

@@ -14,6 +14,7 @@ export default function NavbarComponent() {
             <Nav.Link as={Link} href="/">Beranda</Nav.Link>
             <Nav.Link as={Link} href="/categories">Kategori</Nav.Link>
             <Nav.Link as={Link} href="/about">Tentang Kami</Nav.Link>
+            <Nav.Link as={Link} href="/arsip">Arsip Event</Nav.Link>
           </Nav>
           <Nav>
             <Nav.Link as={Link} href="/addevent">

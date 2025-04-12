@@ -51,6 +51,10 @@ export const guestOptions = [
       name: 'Nextanative',
       image: '/assets/nexta.jpg',
     },
+    {
+      name: 'Shoujo Complex',
+      image: '/assets/shocom.jpg',
+    },
     
     // Tambahkan lainnya...
   ];

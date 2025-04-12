@@ -27,6 +27,15 @@ export async function POST(req) {
             return NextResponse.json({ message: 'No photos provided' }, { status: 400 });
         }
 
+        // Ambil kategori berdasarkan nama
+        const foundCategory = await prisma.category.findUnique({
+            where: { name: category },
+        });
+
+        if (!foundCategory) {
+            return NextResponse.json({ message: 'Kategori tidak ditemukan' }, { status: 400 });
+        }
+
         const uploadedPhotos = [];
 
         for (const photo of photos) {
@@ -59,15 +68,18 @@ export async function POST(req) {
         const newEvent = await prisma.event.create({
             data: {
                 name,
-                date,
+                date: new Date(date),
                 time,
                 location,
                 guest,
-                category,
+                category: {
+                    connect: { id: foundCategory.id }
+                },
                 htm,
                 photos: uploadedPhotos,
             },
         });
+
 
         return NextResponse.json(newEvent, { status: 201 });
     } catch (err) {
@@ -80,13 +92,13 @@ export async function POST(req) {
 
 export async function GET() {
     try {
-      const events = await prisma.event.findMany({
-        orderBy: { date: 'asc' },
-      });
-  
-      return NextResponse.json(events);
+        const events = await prisma.event.findMany({
+            orderBy: { date: 'asc' },
+        });
+
+        return NextResponse.json(events);
     } catch (error) {
-      console.error('[GET EVENTS ERROR]', error);
-      return NextResponse.json({ error: 'Gagal mengambil data event' }, { status: 500 });
+        console.error('[GET EVENTS ERROR]', error);
+        return NextResponse.json({ error: 'Gagal mengambil data event' }, { status: 500 });
     }
-  }
+}

@@ -31,9 +31,20 @@ export default function EventList() {
   // Ambil semua kategori unik dari data event
   const uniqueCategories = Array.from(new Set(events.map(event => event.category)));
   const categories = ['Semua', ...uniqueCategories];
+  const isEventUpcoming = (eventDateStr) => {
+    const eventDate = new Date(eventDateStr);
+    const today = new Date();
+    // Set jam ke 00:00 agar hanya bandingkan tanggal
+    eventDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    return eventDate >= today;
+  };
+  
 
   // Filter event berdasarkan search dan kategori
-  const filteredEvents = events.filter(event => {
+  const filteredEvents = events
+  .filter(event => isEventUpcoming(event.date)) // hanya event yang belum lewat
+  .filter(event => {
     const matchesSearch =
       event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       event.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -44,6 +55,7 @@ export default function EventList() {
 
     return matchesSearch && matchesCategory;
   });
+
 
 
   return (

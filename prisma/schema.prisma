@@ -15,15 +15,24 @@ datasource db {
 }
 
 model event {
+  id         Int       @id @default(autoincrement())
+  name       String
+  date       String
+  time       String
+  location   String
+  guest      String[]
+  htm        String
+  photos     String[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  Category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId Int?
+}
+
+model Category {
   id        Int      @id @default(autoincrement())
-  name      String
-  date      String
-  time      String
-  location  String
-  guest     String[]
-  category  String
-  htm       String
-  photos    String[]
+  name      String   @unique
+  event     event[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

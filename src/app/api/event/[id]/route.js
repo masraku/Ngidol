@@ -23,3 +23,37 @@ export async function GET(req, { params }) {
     return NextResponse.json({ message: 'Terjadi kesalahan pada server' }, { status: 500 });
   }
 }
+
+export async function PUT(req, { params }) {
+  try {
+    const { id } = params;
+    const body = await req.json(); 
+    const categoryName = body.category;
+
+    const updateData = {
+      name: body.name,
+      date: body.date,
+      time: body.time,
+      location: body.location,
+      htm: body.htm,
+      guest: body.guest,
+      photos: body.photos,
+    };
+    
+    if (categoryName) {
+      updateData.Category = {
+        connect: { name: categoryName }
+      };
+    }
+    
+    const updatedEvent = await prisma.event.update({
+      where: { id: parseInt(id) },
+      data: updateData,
+    });
+
+    return Response.json({ message: "Berhasil update event", data: updatedEvent });
+  } catch (error) {
+    console.error("Gagal update event:", error);
+    return Response.json({ message: "Gagal update event", error: error.message }, { status: 500 });
+  }
+}
