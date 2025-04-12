@@ -107,6 +107,10 @@ export const guestOptions = [
     name: 'Idolize',
     image: '/assets/idolize.jpeg',
   },
+  {
+    name: 'Minerva Land',
+    image: '/assets/milen.jpeg',
+  },
 
   // Tambahkan lainnya...
 ];
