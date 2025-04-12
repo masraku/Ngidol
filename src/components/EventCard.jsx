@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
 import Link from 'next/link';
 import { Card, Badge, Row, Col, Button, Image } from 'react-bootstrap';
 import { Calendar, Clock, GeoAlt } from 'react-bootstrap-icons';
 import { useAuth } from '@/app/context/AuthContext'; // sesuaikan path
-import guestOptions from '@/data/guestOptions'; // sesuaikan path
+import { guestOptions } from '@/data/guestOptions';
 
 export default function EventCard({ event }) {
   const { user } = useAuth();

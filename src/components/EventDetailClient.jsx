@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
 import Link from 'next/link';
 import Image from 'next/image';
 import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
 import { Calendar, Clock, GeoAlt, Star, ArrowLeft, Instagram } from 'react-bootstrap-icons';
-import guestOptions from '@/data/guestOptions'; // sesuaikan path jika beda
+import { guestOptions } from '@/data/guestOptions';
 
 export default function EventDetailClient({ event }) {
   const formatDate = (dateString) => {
