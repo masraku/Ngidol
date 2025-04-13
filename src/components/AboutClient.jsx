@@ -13,14 +13,14 @@ export default function AboutClient() {
             <Card.Body className="p-4">
               <h3 className="mb-3">Siapa Kami</h3>
               <p>
-                Mikseru Event adalah platform terdepan untuk menemukan dan mengikuti berbagai event Chika Idol menarik 
-                di Jakarta. Management kami berkomitmen untuk menghubungkan penyelenggara event dengan 
+                EventKu by Mikseru adalah platform terdepan untuk menemukan dan mengikuti berbagai event Chika Idol maupun Idol Major seperti JKT48 yang menarik 
+                di JaBoDeTaBek. Team kami berkomitmen untuk menghubungkan penyelenggara event dengan 
                 para pengunjung yang mencari pengalaman baru dan menarik.
               </p>
               
               <h3 className="mb-3 mt-4">Visi Kami</h3>
               <p>
-                Menjadi platform acara terkemuka yang menghubungkan orang-orang dengan pengalaman 
+                Menjadi platform acara Idol yang menghubungkan orang-orang dengan pengalaman 
                 yang memperkaya hidup dan menciptakan kenangan tak terlupakan.
               </p>
               
