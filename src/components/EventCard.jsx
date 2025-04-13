@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Card, Badge, Row, Col, Button, Image } from 'react-bootstrap';
-import { Calendar, Clock, GeoAlt } from 'react-bootstrap-icons';
+import { Calendar, Clock, GeoAlt,CurrencyExchange } from 'react-bootstrap-icons';
 import { useAuth } from '@/app/context/AuthContext'; // sesuaikan path
 import { guestOptions } from '@/data/guestOptions';
 
@@ -96,6 +96,11 @@ export default function EventCard({ event }) {
                 </div>
               </div>
             )}
+
+            <div className="d-flex align-items-center mb-2">
+              <CurrencyExchange className="me-2" />
+              <span>{event.htm}</span>
+            </div>
 
             <Button as={Link} href={`/event/${event.id}`} variant="outline-primary" className="me-2">
               Lihat Detail
