@@ -123,6 +123,18 @@ export const guestOptions = [
     name: 'Stellify',
     image: '/assets/stelify.jpeg',
   },
+  {
+    name: 'A+ Shoujo',
+    image: '/assets/ashoujo.jpeg',
+  },
+  {
+    name: 'Ametta',
+    image: '/assets/Ametta.jpeg',
+  },
+  {
+    name: 'Up Girls',
+    image: '/assets/ug.jpeg',
+  },
 
-  // Tambahkan lainnya...
+
 ];
