@@ -111,6 +111,18 @@ export const guestOptions = [
     name: 'Minerva Land',
     image: '/assets/milen.jpeg',
   },
+  {
+    name: 'Naira',
+    image: '/assets/naira.jpeg',
+  },
+  {
+    name: 'Stellar Lunar',
+    image: '/assets/stellar.jpeg',
+  },
+  {
+    name: 'Stellify',
+    image: '/assets/stelify.jpeg',
+  },
 
   // Tambahkan lainnya...
 ];
