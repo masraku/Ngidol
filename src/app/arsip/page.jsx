@@ -13,7 +13,7 @@ export default function ArsipEvent() {
     const fetchEvents = async () => {
       try {
         const res = await axios.get('/api/event/arsip');
-        setEvents(res.data);
+        setEvents(res.data); // Data dari backend sudah berupa arsip
       } catch (err) {
         console.error('Gagal fetch event:', err);
       } finally {
@@ -24,21 +24,6 @@ export default function ArsipEvent() {
     fetchEvents();
   }, []);
 
-  // Cek apakah event sudah lebih dari 1 hari lewat
-  const isPastEvent = (eventDateStr) => {
-    const eventDate = new Date(eventDateStr);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set today ke tengah malam
-
-    // Hitung selisih waktu dalam hari
-    const diffTime = Math.abs(today - eventDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Ubah ms ke hari
-    return diffDays > 0; // Jika event sudah lebih dari 1 hari, baru masuk arsip
-  };
-
-  // Filter event yang sudah lewat
-  const archivedEvents = events.filter(event => isPastEvent(event.date));
-
   return (
     <Container className="py-5">
       <h2 className="mb-4 text-center">Arsip Event</h2>
@@ -47,10 +32,10 @@ export default function ArsipEvent() {
         <div className="text-center py-5">
           <Spinner animation="border" variant="primary" />
         </div>
-      ) : archivedEvents.length > 0 ? (
+      ) : events.length > 0 ? (
         <Row className="justify-content-center">
           <Col md={8}>
-            {archivedEvents.map(event => (
+            {events.map(event => (
               <EventCard key={event.id} event={event} />
             ))}
           </Col>
