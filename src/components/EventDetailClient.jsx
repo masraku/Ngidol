@@ -65,7 +65,7 @@ export default function EventDetailClient({ event }) {
                             alt={`Photo ${index + 1}`}
                             width={800}
                             height={400}
-                            className="d-block w-100 rounded"
+                            className="img-fluid rounded"
                           />
                         </Carousel.Item>
                       ))}
