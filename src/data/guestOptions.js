@@ -135,6 +135,17 @@ export const guestOptions = [
     name: 'Up Girls',
     image: '/assets/ug.jpeg',
   },
-
+  {
+    name: 'Bubble Bliss',
+    image: '/assets/bubble.png'
+  },
+  {
+    name: 'ArigaChuu',
+    image: '/assets/arigachu.jpg'
+  },
+  {
+    name: 'Sirene Star',
+    image: '/assets/sirene.jpg'
+  }
 
 ];
