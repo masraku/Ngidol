@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Badge, Carousel } from 'react-bootstrap';
 import { Calendar, Clock, GeoAlt, Instagram, ArrowLeft } from 'react-bootstrap-icons';
 import { guestOptions } from '@/data/guestOptions';
 
@@ -46,17 +46,34 @@ export default function EventDetailClient({ event }) {
               <h1 className="mb-3">{event.name}</h1>
               <Badge bg="primary" className="mb-4">{event.category}</Badge>
 
-              {event.photos?.[0] && (
+              {event.photos && event.photos.length > 0 && (
                 <div className="mb-4">
-                  <Image
-                    src={event.photos[0]}
-                    alt={event.name}
-                    width={800}
-                    height={400}
-                    className="img-fluid rounded"
-                  />
+                  {event.photos.length === 1 ? (
+                    <Image
+                      src={event.photos[0]}
+                      alt={event.name}
+                      width={800}
+                      height={400}
+                      className="img-fluid rounded"
+                    />
+                  ) : (
+                    <Carousel interval={3000} fade indicators={event.photos.length > 1}>
+                      {event.photos.slice(0, 3).map((photo, index) => (
+                        <Carousel.Item key={index}>
+                          <Image
+                            src={photo}
+                            alt={`Photo ${index + 1}`}
+                            width={800}
+                            height={400}
+                            className="d-block w-100 rounded"
+                          />
+                        </Carousel.Item>
+                      ))}
+                    </Carousel>
+                  )}
                 </div>
               )}
+
 
               <div className="bg-light p-4 rounded mb-4">
                 <Row>
