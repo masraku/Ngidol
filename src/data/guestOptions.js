@@ -146,6 +146,10 @@ export const guestOptions = [
   {
     name: 'Sirene Star',
     image: '/assets/sirene.jpg'
+  },
+  {
+    name: 'Karaoke Kataomoi',
+    image: '/assets/karaoke.jpg'
   }
 
 ];
