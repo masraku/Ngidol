@@ -1,31 +1,37 @@
 import EventDetailClient from '@/components/EventDetailClient';
 import axios from 'axios';
 
-
-// Metadata dinamis
 export async function generateMetadata({ params }) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://mikseru.vercel.app'; // fallback
+
     const res = await axios.get(`${baseUrl}/api/event/${params.id}`);
     const event = res.data;
 
-    const imageUrl = event.photos?.[0]
-      ? (event.photos[0].startsWith('http') ? event.photos[0] : `${baseUrl}${event.photos[0]}`)
-      : `${baseUrl}/default-og-image.jpg`;
+    let imageUrl = `${baseUrl}/default-og-image.jpg`; // default
+
+    if (event.photos?.[0]) {
+      // Cek kalau sudah https
+      if (event.photos[0].startsWith('http')) {
+        imageUrl = event.photos[0];
+      } else {
+        imageUrl = `${baseUrl}${event.photos[0]}`;
+      }
+    }
 
     return {
       title: `${event.name} | EventKu`,
-      description: event.location + ' - ' + event.time,
+      description: `${event.location} - ${event.time}`,
       openGraph: {
         title: `${event.name} | EventKu`,
-        description: event.location + ' - ' + event.time,
+        description: `${event.location} - ${event.time}`,
         url: `${baseUrl}/event/${params.id}`,
         type: 'website',
         images: [
           {
             url: imageUrl,
-            width: 800,
-            height: 600,
+            width: 1200,
+            height: 630,
             alt: event.name,
           },
         ],
@@ -33,7 +39,7 @@ export async function generateMetadata({ params }) {
       twitter: {
         card: 'summary_large_image',
         title: `${event.name} | EventKu`,
-        description: event.location + ' - ' + event.time,
+        description: `${event.location} - ${event.time}`,
         images: [imageUrl],
       },
     };
@@ -45,10 +51,9 @@ export async function generateMetadata({ params }) {
   }
 }
 
-// Halaman detail event
 export default async function EventDetailPage({ params }) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://mikseru.vercel.app';
     const res = await axios.get(`${baseUrl}/api/event/${params.id}`);
     const event = res.data;
 
