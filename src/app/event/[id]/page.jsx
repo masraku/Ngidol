@@ -9,9 +9,33 @@ export async function generateMetadata({ params }) {
     const res = await axios.get(`${baseUrl}/api/event/${params.id}`);
     const event = res.data;
 
+    const imageUrl = event.photos?.[0]
+      ? (event.photos[0].startsWith('http') ? event.photos[0] : `${baseUrl}${event.photos[0]}`)
+      : `${baseUrl}/default-og-image.jpg`;
+
     return {
       title: `${event.name} | EventKu`,
-      photo: event.photos,
+      description: event.location + ' - ' + event.time,
+      openGraph: {
+        title: `${event.name} | EventKu`,
+        description: event.location + ' - ' + event.time,
+        url: `${baseUrl}/event/${params.id}`,
+        type: 'website',
+        images: [
+          {
+            url: imageUrl,
+            width: 800,
+            height: 600,
+            alt: event.name,
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: `${event.name} | EventKu`,
+        description: event.location + ' - ' + event.time,
+        images: [imageUrl],
+      },
     };
   } catch (error) {
     return {
