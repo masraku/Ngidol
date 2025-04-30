@@ -1,6 +1,7 @@
 // app/page.jsx
 import axios from 'axios';
 import EventList from '@/components/EventList';
+import Maintenance from '@/components/Maintenance';
 
 export const metadata = {
   title: 'Mikseru - Jadwal Event',
@@ -21,7 +22,8 @@ export default async function Home() {
 
   return (
     <main>
-      <EventList events={events} />
+      <Maintenance/>
+      {/* <EventList events={events} /> */}
     </main>
   );
 }
