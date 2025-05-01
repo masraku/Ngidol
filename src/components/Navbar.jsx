@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 import { Navbar, Container, Nav, Button } from 'react-bootstrap';
+import Image from 'next/image';
 
 export default function NavbarComponent() {
   const { user, setUser, fetchUser } = useAuth();
@@ -21,32 +22,38 @@ export default function NavbarComponent() {
   };
 
   return (
-    <Navbar bg="dark" variant="dark" expand="lg" sticky="top" className="shadow-sm">
+    <Navbar
+      variant='dark'
+      expand="lg"
+      sticky='top'
+      className='shadow-sm'
+      style={{ backgroundColor: '#431006' }}>
       <Container>
-        <Navbar.Brand as={Link} href="/">EventKu by Mikseru</Navbar.Brand>
+        <Navbar.Brand as={Link} href="/">
+          <Image src="/assets/logo.svg" alt="Logo" width={250} height={125} className="d-inline-block align-top me-2" />
+        </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto">
-            <Nav.Link as={Link} href="/">Beranda</Nav.Link>
-            <Nav.Link as={Link} href="/categories">Kategori</Nav.Link>
-            <Nav.Link as={Link} href="/about">Tentang Kami</Nav.Link>
-            <Nav.Link as={Link} href="/arsip">Arsip Event</Nav.Link>
-          </Nav>
-          <Nav className="align-items-center">
+          <Nav className="ms-auto align-items-center">
+            <Nav.Link as={Link} href="/" className="nav-link-custom">Beranda</Nav.Link>
+            <Nav.Link as={Link} href="/chant" className="nav-link-custom">Chant</Nav.Link>
+            <Nav.Link as={Link} href="/about" className="nav-link-custom">Tentang Kami</Nav.Link>
+            <Nav.Link as={Link} href="/arsip" className="nav-link-custom">Arsip Event</Nav.Link>
+
             {user ? (
               <>
-                <Nav.Link as={Link} href="/addevent">
-                  <Button variant="outline-light" className="me-2">Tambah Event</Button>
+                <Nav.Link as={Link} href="/addevent" className="nav-link-custom">Tambah Event</Nav.Link>
+                <Nav.Link onClick={handleLogout} className="nav-link-custom" style={{ cursor: 'pointer' }}>
+                  Logout
                 </Nav.Link>
-                <Button variant="danger" onClick={handleLogout}>Logout</Button>
               </>
             ) : (
-              <Nav.Link as={Link} href="/auth">
-                <Button variant="outline-light">Login</Button>
-              </Nav.Link>
+              <Nav.Link as={Link} href="/auth" className="nav-link-custom">Login</Nav.Link>
             )}
           </Nav>
+
         </Navbar.Collapse>
+
       </Container>
     </Navbar>
   );

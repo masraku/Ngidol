@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Card, Badge, Row, Col, Button, Image } from 'react-bootstrap';
-import { Calendar, Clock, GeoAlt,CurrencyExchange } from 'react-bootstrap-icons';
+import { Calendar, Clock, GeoAlt, CurrencyExchange } from 'react-bootstrap-icons';
 import { useAuth } from '@/app/context/AuthContext'; // sesuaikan path
 import { guestOptions } from '@/data/guestOptions';
 
@@ -31,7 +31,7 @@ export default function EventCard({ event }) {
       <Card.Body>
         <Row>
           <Col md={3} className="mb-3 mb-md-0 text-center">
-            <div className="p-3 bg-primary text-white rounded mb-3">
+            <div className="p-3 text-white rounded mb-3" style={{ backgroundColor: '#431006' }}>
               <h3>{new Date(event.date[0]).getDate()}</h3>
               <p className="mb-0">{formatDate(event.date[0]).split(',')[1]}</p>
               <p className="mb-0">({getEventDuration(event.date)} Hari)</p> {/* Show event duration */}
@@ -102,12 +102,16 @@ export default function EventCard({ event }) {
               <span>{event.htm}</span>
             </div>
 
-            <Button as={Link} href={`/event/${event.id}`} variant="outline-primary" className="me-2">
-              Lihat Detail
+            <Button
+              as={Link}
+              href={`/event/${event.slug}`}
+              variant='outline-danger'
+              className='me-2 button-animate'>
+              Lihat Event
             </Button>
 
             {user && (
-              <Button as={Link} href={`/event/edit/${event.id}`} variant="outline-warning">
+              <Button as={Link} href={`/event/edit/${event.slug}`} variant="outline-warning">
                 Edit Event
               </Button>
             )}

@@ -5,7 +5,7 @@ export async function generateMetadata({ params }) {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://mikseru.vercel.app'; // fallback
 
-    const res = await axios.get(`${baseUrl}/api/event/${params.id}`);
+    const res = await axios.get(`${baseUrl}/api/event/${params.slug}`);
     const event = res.data;
 
     let imageUrl = `${baseUrl}/default-og-image.jpg`; // default
@@ -54,7 +54,7 @@ export async function generateMetadata({ params }) {
 export default async function EventDetailPage({ params }) {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://mikseru.vercel.app';
-    const res = await axios.get(`${baseUrl}/api/event/${params.id}`);
+    const res = await axios.get(`${baseUrl}/api/event/${params.slug}`);
     const event = res.data;
 
     return <EventDetailClient event={event} />;

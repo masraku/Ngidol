@@ -74,8 +74,8 @@ export default function EventList() {
     <Container fluid className="py-5 bg-light">
       <Row className="justify-content-center mb-4">
         <Col md={8} className="text-center">
-          <h1 className="display-4 fw-bold mb-3">Jadwal Event</h1>
-          <p className="lead text-muted">Temukan event menarik yang akan datang</p>
+          <h1 className="display-4 fw-bold mb-3">Muchitsujo Event</h1>
+          <p className="lead text-muted">kemana kita?</p>
         </Col>
       </Row>
 
@@ -118,7 +118,7 @@ export default function EventList() {
             </div>
           ) : filteredEvents.length > 0 ? (
             filteredEvents.map(event => (
-              <EventCard key={event.id} event={event} />
+              <EventCard key={event.slug} event={event} />
             ))
           ) : (
             <div className="text-center py-5">

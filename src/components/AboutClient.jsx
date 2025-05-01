@@ -7,33 +7,26 @@ export default function AboutClient() {
     <Container className="py-5">
       <Row className="justify-content-center">
         <Col md={8}>
-          <h1 className="mb-4 text-center">Tentang Mikseru</h1>
+          <h1 className="mb-4 text-center">Muchitsujo</h1>
           
           <Card className="shadow-sm border-0 mb-4">
             <Card.Body className="p-4">
-              <h3 className="mb-3">Siapa Kami</h3>
+              <h3 className="mb-3">Web apa sih ini?</h3>
               <p>
-                EventKu by Mikseru adalah platform terdepan untuk menemukan dan mengikuti berbagai event Chika Idol maupun Idol Major seperti JKT48 yang menarik 
+                Muchitsujo Event adalah platform terdepan untuk menemukan dan mengikuti berbagai event Chika Idol maupun Idol Major seperti JKT48 yang menarik 
                 di JaBoDeTaBek. Team kami berkomitmen untuk menghubungkan penyelenggara event dengan 
                 para pengunjung yang mencari pengalaman baru dan menarik.
               </p>
               
-              <h3 className="mb-3 mt-4">Visi Kami</h3>
+              <h3 className="mb-3 mt-4">Siapa kami?</h3>
               <p>
-                Menjadi platform acara Idol yang menghubungkan orang-orang dengan pengalaman 
-                yang memperkaya hidup dan menciptakan kenangan tak terlupakan.
+                kami adalah sekelompok anak-anak penggemar skena idol major maupun lokal yang ingin mengisi masa muda dengan hal-hal positif.
+                Kami percaya bahwa event-event ini tidak hanya memberikan hiburan, tetapi juga
+                kesempatan untuk bertemu orang-orang baru, belajar, dan tumbuh bersama dalam komunitas yang penuh semangat.
+                ikuti kami di
+                <a href="https://www.instagram.com/muchitsujo_/" target="_blank" rel="noopener noreferrer">Muchitsujo</a>
               </p>
               
-              <h3 className="mb-3 mt-4">Misi Kami</h3>
-              <p>
-                Kami berkomitmen untuk:
-              </p>
-              <ul>
-                <li>Menyediakan platform yang mudah digunakan untuk menemukan event</li>
-                <li>Mendukung penyelenggara acara untuk mempromosikan event mereka</li>
-                <li>Memastikan pengalaman terbaik bagi semua pengguna</li>
-                <li>Memperluas akses ke berbagai jenis event di seluruh Indonesia</li>
-              </ul>
               
               <h3 className="mb-3 mt-4">Hubungi Kami</h3>
               <p>

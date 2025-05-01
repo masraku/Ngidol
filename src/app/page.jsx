@@ -22,8 +22,8 @@ export default async function Home() {
 
   return (
     <main>
-      <Maintenance/>
-      {/* <EventList events={events} /> */}
+      {/* <Maintenance/> */}
+      <EventList events={events} />
     </main>
   );
 }

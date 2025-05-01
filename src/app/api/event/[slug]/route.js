@@ -1,16 +1,16 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma'; // pastikan file ini sudah ada
+import prisma from '@/lib/prisma';
 
 export async function GET(req, { params }) {
-  const id = parseInt(params.id);
+  const slug = params.slug;
 
-  if (isNaN(id)) {
-    return NextResponse.json({ message: 'ID tidak valid' }, { status: 400 });
+  if (!slug) {
+    return NextResponse.json({ message: 'Slug tidak valid' }, { status: 400 });
   }
 
   try {
-    const event = await prisma.Event.findUnique({
-      where: { id: parseInt(params.id) },
+    const event = await prisma.event.findUnique({
+      where: { slug },
       include: { Category: true },
     });
 
@@ -27,11 +27,10 @@ export async function GET(req, { params }) {
 
 export async function PUT(req, { params }) {
   try {
-    const { id } = params; // mendapatkan id dari URL parameter
-    const body = await req.json(); // mendapatkan data dari request body
-    const categoryName = body.category; // kategori event, jika ada
+    const slug = params.slug;
+    const body = await req.json();
+    const categoryName = body.category;
 
-    // Persiapkan data yang akan diupdate
     const updateData = {
       name: body.name,
       time: body.time,
@@ -42,39 +41,33 @@ export async function PUT(req, { params }) {
       photos: body.photos,
     };
 
-    // Validasi dan ubah 'date' menjadi array, jika belum
+    // Validasi dan parsing tanggal
     if (Array.isArray(body.date)) {
-      // Jika 'date' sudah array, pastikan tanggalnya valid
-      const validDates = body.date.filter(dateStr => {
-        const d = new Date(dateStr);
-        return !isNaN(d.getTime()); // pastikan tanggal valid
-      });
+      const validDates = body.date.filter(dateStr => !isNaN(new Date(dateStr).getTime()));
       if (validDates.length > 0) {
         updateData.date = validDates;
       } else {
         return NextResponse.json({ message: 'Tidak ada tanggal yang valid' }, { status: 400 });
       }
     } else if (body.date) {
-      // Jika 'date' tidak dalam bentuk array, kita coba ubah jadi array satu tanggal
       const d = new Date(body.date);
       if (!isNaN(d.getTime())) {
-        updateData.date = [body.date]; // jadikan array
+        updateData.date = [body.date];
       } else {
         return NextResponse.json({ message: 'Tanggal tidak valid' }, { status: 400 });
       }
     }
 
-    // Jika kategori ada, hubungkan dengan kategori yang ada
+    // Update kategori jika ada
     if (categoryName) {
       updateData.Category = {
-        connect: { name: categoryName }
+        connect: { name: categoryName },
       };
     }
 
-    // Update event di database
-    const updatedEvent = await prisma.Event.update({
-      where: { id: parseInt(id) }, // mencari event berdasarkan ID
-      data: updateData, // data yang akan diupdate
+    const updatedEvent = await prisma.event.update({
+      where: { slug },
+      data: updateData,
     });
 
     return NextResponse.json({ message: "Berhasil update event", data: updatedEvent });
@@ -83,4 +76,3 @@ export async function PUT(req, { params }) {
     return NextResponse.json({ message: "Gagal update event", error: error.message }, { status: 500 });
   }
 }
-
