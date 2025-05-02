@@ -5,21 +5,7 @@ import Maintenance from '@/components/Maintenance';
 
 export const metadata = {
   title: 'Muchitsujo Event',
-  openGraph: {
-    title: 'Muchitsujo Event',
-    description: 'Temukan event menarik yang akan datang di Muchtsujo Event.',
-    url: 'https://muchitsujo.site',
-    siteName: 'Muchitsujo Event',
-    images: [
-      {
-        url: '/assets/logo.svg',
-        width: 1200,
-        height: 630,
-      },
-    ],
-    locale: 'id_ID',
-    type: 'website',
-  },
+  description: 'Temukan event menarik yang akan datang di Muchitsujo Event',
 };
 
 export default async function Home() {
