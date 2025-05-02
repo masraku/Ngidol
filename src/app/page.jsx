@@ -12,7 +12,7 @@ export const metadata = {
     type: 'website',
     images: [
       {
-        url: 'https://www.muchitsujo.site/default-og-image.jpg',
+        url: 'https://www.muchitsujo.site/assets/logo.svg',
         width: 1200,
         height: 630,
         alt: 'Muchitsujo Event',

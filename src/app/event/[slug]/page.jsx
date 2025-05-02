@@ -9,7 +9,7 @@ export async function generateMetadata({ params }) {
 
     const imageUrl = event.photos?.[0]?.startsWith('http')
       ? event.photos[0]
-      : `${baseUrl}/default-og-image.jpg`; // fallback kalau tidak ada foto
+      : `${baseUrl}/assets/logo.svg`; // fallback kalau tidak ada foto
 
     return {
       title: `${event.name} | EventKu`,
