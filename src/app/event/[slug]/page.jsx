@@ -25,7 +25,7 @@ export async function generateMetadata({ params }) {
       openGraph: {
         title: `${event.name} | EventKu`,
         description: `${event.location} - ${event.time}`,
-        url: `${baseUrl}/event/${params.id}`,
+        url: `${baseUrl}/event/${params.slug}`,
         type: 'website',
         images: [
           {
