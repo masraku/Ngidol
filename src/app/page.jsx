@@ -4,8 +4,23 @@ import EventList from '@/components/EventList';
 import Maintenance from '@/components/Maintenance';
 
 export const metadata = {
-  title: 'Mikseru - Jadwal Event',
-  description: 'Temukan event menarik yang akan datang di Mikseru',
+  title: 'Muchitsujo Event',
+  openGraph: {
+    title: 'Muchitsujo Event',
+    description: 'Temukan event menarik yang akan datang di Mikseru',
+    url: 'https://muchitsujo.site',
+    siteName: 'Muchitsujo Event',
+    images: [
+      {
+        url: '/assets/logo.svg',
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: 'id_ID',
+    type: 'website',
+  },
+  description: 'Temukan event menarik yang akan datang di Muchitsujo',
 };
 
 export default async function Home() {

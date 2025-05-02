@@ -36,6 +36,21 @@ export const chants = [
                 Waipa!`
     },
     {
+        title: 'Accel MiX',
+        lyrics: `Nojou!
+                Mai!
+                Umiu!
+                Cho!
+                Jokyo Tobi Kasen Shindou Ama Seni Jinzou Hi!
+                Tora! Hi! Tora! Hi!
+                Tora! Tora! Tora!
+                Tora Jinzou Ama Shindou!
+                Amasin Amasin Ama Shindou!
+                Amasen Amasen Jinzou Hi!
+                Tora Hi Jinzou Seni!
+                Ama! Shindou! Kasen! Tobi! Jokyo! Cho! Umiu! Mai! Nojou!`
+    },
+    {
         title: 'Myohontusuke Hajimaru',
         lyrics: `Hajimaru yo!
                 Hajimaru yo!
