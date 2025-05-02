@@ -5,9 +5,27 @@ import Maintenance from '@/components/Maintenance';
 
 export const metadata = {
   title: 'Muchitsujo Event',
-  description: 'Temukan event menarik yang akan datang di Muchitsujo Event',
+  openGraph: {
+    title: 'Muchitsujo Event',
+    description: 'Temukan event menarik yang akan datang di Muchitsujo Event',
+    url: 'https://www.muchitsujo.site/',
+    type: 'website',
+    images: [
+      {
+        url: 'https://www.muchitsujo.site/default-og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Muchitsujo Event',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Muchitsujo Event',
+    description: 'Temukan event menarik yang akan datang di Muchitsujo Event',
+    images: ['https://www.muchitsujo.site/default-og-image.jpg'],
+  }
 };
-
 export default async function Home() {
 
   let events = [];
