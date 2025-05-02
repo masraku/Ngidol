@@ -3,21 +3,13 @@ import axios from 'axios';
 
 export async function generateMetadata({ params }) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.muchitsujo.site/'; // fallback
-
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.muchitsujo.site';
     const res = await axios.get(`${baseUrl}/api/event/${params.slug}`);
     const event = res.data;
 
-    let imageUrl = `${baseUrl}/default-og-image.jpg`; // default
-
-    if (event.photos?.[0]) {
-      // Cek kalau sudah https
-      if (event.photos[0].startsWith('http')) {
-        imageUrl = event.photos[0];
-      } else {
-        imageUrl = `${baseUrl}${event.photos[0]}`;
-      }
-    }
+    const imageUrl = event.photos?.[0]?.startsWith('http')
+      ? event.photos[0]
+      : `${baseUrl}/default-og-image.jpg`; // fallback kalau tidak ada foto
 
     return {
       title: `${event.name} | EventKu`,
@@ -44,12 +36,14 @@ export async function generateMetadata({ params }) {
       },
     };
   } catch (error) {
+    console.error('[Metadata Error]', error);
     return {
       title: 'Event Tidak Ditemukan',
       description: 'Event yang Anda cari tidak ditemukan',
     };
   }
 }
+
 
 export default async function EventDetailPage({ params }) {
   try {
