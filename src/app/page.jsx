@@ -7,7 +7,7 @@ export const metadata = {
   title: 'Muchitsujo Event',
   openGraph: {
     title: 'Muchitsujo Event',
-    description: 'Temukan event menarik yang akan datang di Mikseru',
+    description: 'Temukan event menarik yang akan datang di Muchtsujo Event.',
     url: 'https://muchitsujo.site',
     siteName: 'Muchitsujo Event',
     images: [
@@ -20,7 +20,6 @@ export const metadata = {
     locale: 'id_ID',
     type: 'website',
   },
-  description: 'Temukan event menarik yang akan datang di Muchitsujo',
 };
 
 export default async function Home() {
