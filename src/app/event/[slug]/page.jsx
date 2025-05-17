@@ -39,7 +39,7 @@ export async function generateMetadata({ params }) {
     console.error('[Metadata Error]', error);
     return {
       title: 'Event Tidak Ditemukan',
-      description: 'Event yang Anda cari tidak ditemukan',
+      description: 'Event yang Anda cari tidak ditemukan!',
     };
   }
 }
