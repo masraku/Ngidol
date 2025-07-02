@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { supabase } from '@/lib/supabase';
+import { v4 as uuidv4 } from 'uuid';
+
 
 export async function GET(req, { params }) {
   const slug = params.slug;
@@ -11,7 +14,16 @@ export async function GET(req, { params }) {
   try {
     const event = await prisma.event.findUnique({
       where: { slug },
-      include: { Category: true },
+      include: {
+        category: true,
+        guests: {
+          select: {
+            id: true,
+            name: true,
+            image: true
+          }
+        }
+      },
     });
 
     if (!event) {
@@ -28,46 +40,90 @@ export async function GET(req, { params }) {
 export async function PUT(req, { params }) {
   try {
     const slug = params.slug;
-    const body = await req.json();
-    const categoryName = body.category;
+    const formData = await req.formData();
+
+    const name = formData.get('name');
+    const time = formData.get('time');
+    const location = formData.get('location');
+    const htm = formData.get('htm');
+    const link = formData.get('link');
+    const dateRaw = formData.get('date');
+    const category = formData.get('category');
+    const guestsRaw = formData.get('guest');
+    const photos = formData.getAll('photos');
 
     const updateData = {
-      name: body.name,
-      time: body.time,
-      location: body.location,
-      htm: body.htm,
-      link: body.link,
-      guest: body.guest,
-      photos: body.photos,
+      name,
+      time,
+      location,
+      htm,
+      link,
     };
 
-    // Validasi dan parsing tanggal
-    if (Array.isArray(body.date)) {
-      const validDates = body.date.filter(dateStr => !isNaN(new Date(dateStr).getTime()));
-      if (validDates.length > 0) {
-        updateData.date = validDates;
-      } else {
-        return NextResponse.json({ message: 'Tidak ada tanggal yang valid' }, { status: 400 });
-      }
-    } else if (body.date) {
-      const d = new Date(body.date);
-      if (!isNaN(d.getTime())) {
-        updateData.date = [body.date];
-      } else {
-        return NextResponse.json({ message: 'Tanggal tidak valid' }, { status: 400 });
+    // Handle date
+    if (dateRaw) {
+      const dateArr = JSON.parse(dateRaw);
+      if (Array.isArray(dateArr)) {
+        const validDates = dateArr.filter(d => !isNaN(new Date(d).getTime()));
+        updateData.date = validDates.map(d => new Date(d));
       }
     }
 
-    // Update kategori jika ada
-    if (categoryName) {
-      updateData.Category = {
-        connect: { name: categoryName },
-      };
+    // Handle category
+    if (category) {
+      const categoryData = await prisma.category.findUnique({
+        where: { name: category }
+      });
+      if (categoryData) {
+        updateData.categoryId = categoryData.id;
+      }
+    }
+
+    // Handle guests
+    if (guestsRaw) {
+      const guests = JSON.parse(guestsRaw);
+      if (Array.isArray(guests)) {
+        updateData.guests = {
+          set: [],
+          connect: guests.map(g => ({ id: g.id })),
+        };
+      }
+    }
+
+    // Upload foto ke Supabase jika ada
+    const uploadedPhotos = [];
+    for (const photo of photos) {
+      if (photo && photo.size > 0 && photo.type.startsWith('image/')) {
+        const buffer = Buffer.from(await photo.arrayBuffer());
+        const filename = `event/${Date.now()}-${uuidv4()}`;
+        const { data, error } = await supabase.storage
+          .from('event')
+          .upload(filename, buffer, {
+            contentType: photo.type,
+          });
+
+        if (error) {
+          throw new Error('Gagal upload foto');
+        }
+
+        const photoUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/event/${filename}`;
+        uploadedPhotos.push(photoUrl);
+      }
+    }
+
+    if (uploadedPhotos.length > 0) {
+      updateData.photos = uploadedPhotos;
     }
 
     const updatedEvent = await prisma.event.update({
       where: { slug },
       data: updateData,
+      include: {
+        category: true,
+        guests: {
+          select: { id: true, name: true, image: true }
+        }
+      }
     });
 
     return NextResponse.json({ message: "Berhasil update event", data: updatedEvent });

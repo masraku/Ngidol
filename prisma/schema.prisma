@@ -18,23 +18,25 @@ model Event {
   id         Int        @id @default(autoincrement())
   name       String
   date       DateTime[]
-  slug       String?     @unique
+  slug       String?    @unique
   time       String
   location   String
-  guest      String[]
   htm        String
   link       String?
   photos     String[]
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
-  Category   Category?  @relation(fields: [categoryId], references: [id])
+  category   Category?  @relation(fields: [categoryId], references: [id])
   categoryId Int?
+
+  guests Idol[] @relation("EventGuests")
 }
 
 model Category {
   id        Int      @id @default(autoincrement())
   name      String   @unique
   event     Event[]
+  idols     Idol[] // Relation field to Idol
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -46,4 +48,41 @@ model Admin {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Idol {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  sosmeds     String[]
+  image       String
+  description String
+  createdAt   DateTime @default(now())
+
+  categoryId Int?
+  category   Category? @relation(fields: [categoryId], references: [id])
+
+  members Member[]
+  songs   Song[]
+
+  events Event[] @relation("EventGuests") // many-to-many relasi
+}
+
+model Member {
+  id          String  @id @default(uuid())
+  name        String
+  image       String
+  description String
+  instagram   String?
+  X           String?
+  idolId      String
+  idol        Idol    @relation(fields: [idolId], references: [id])
+}
+
+model Song {
+  id         String @id @default(uuid())
+  title      String
+  spotifyUrl String
+  idolId     String
+  idol       Idol   @relation(fields: [idolId], references: [id])
 }

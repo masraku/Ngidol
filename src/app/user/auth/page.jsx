@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Form, Button, Card, Container, Alert } from 'react-bootstrap';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '@/app/user/context/AuthContext';
 
 export default function LoginPage() {
   const {setUser, fetchUser}  = useAuth();
@@ -21,7 +21,7 @@ export default function LoginPage() {
       const res = await axios.post('/api/auth', { email, password });
       if (res.data.success) {
         await fetchUser();
-        router.push('/');
+        router.push('/admin');
       }
     } catch (err) {
       setErrorMsg(err.response?.data?.message || 'Login gagal');

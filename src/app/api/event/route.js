@@ -1,113 +1,132 @@
+// src/app/api/event/route.js
 import { NextResponse } from 'next/server';
+import { v4 as uuidv4 } from 'uuid';
 import prisma from '@/lib/prisma';
 import { supabase } from '@/lib/supabase';
-import slugify from 'slugify';
 
 export async function POST(req) {
   try {
     const formData = await req.formData();
+
     const name = formData.get('name');
+    const slug = name.toLowerCase().replace(/\s+/g, '-');
     const time = formData.get('time');
     const location = formData.get('location');
     const link = formData.get('link');
-    const category = formData.get('category');
     const htm = formData.get('htm');
-    const guestRaw = formData.get('guest');
+    const categoryName = formData.get('category');
     const dateRaw = formData.get('date');
+    const guestRaw = formData.get('guest');
     const photos = formData.getAll('photos');
 
-    if (!name || !dateRaw || !time || !location || !category || !htm || !guestRaw) {
-      return NextResponse.json({ message: 'Data tidak lengkap' }, { status: 400 });
+    // Parse array field
+    const dates = JSON.parse(dateRaw); // array of date string
+    const guests = JSON.parse(guestRaw); // array of { id, name, image, etc. }
+
+    // Ambil ID kategori (bukan nama)
+    let categoryId = null;
+    if (categoryName) {
+      const category = await prisma.category.findUnique({
+        where: { name: categoryName },
+      });
+      if (category) categoryId = category.id;
     }
 
-    const slug = slugify(name, { lower: true, strict: true });
-
-    // Parse tanggal
-    let dateArray;
-    try {
-      const parsed = JSON.parse(dateRaw);
-      if (!Array.isArray(parsed) || parsed.length === 0) {
-        return NextResponse.json({ message: 'Tanggal tidak valid atau kosong' }, { status: 400 });
-      }
-      dateArray = parsed.map((d) => new Date(d));
-    } catch (err) {
-      return NextResponse.json({ message: 'Format tanggal tidak valid' }, { status: 400 });
-    }
-
-    // Parse guest
-    let guest = [];
-    try {
-      guest = JSON.parse(guestRaw);
-    } catch (err) {
-      return NextResponse.json({ message: 'Format guest tidak valid' }, { status: 400 });
-    }
-
-    // Validasi kategori
-    const foundCategory = await prisma.category.findUnique({
-      where: { name: category },
-    });
-
-    if (!foundCategory) {
-      return NextResponse.json({ message: 'Kategori tidak ditemukan' }, { status: 400 });
-    }
-
-    // Upload foto
+    // Upload photos ke Supabase
     const uploadedPhotos = [];
     for (const photo of photos) {
-      const fileExt = photo.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `public/event/${fileName}`;
-
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const buffer = Buffer.from(await photo.arrayBuffer());
+      const filename = `event/${Date.now()}-${uuidv4()}`;
+      const { data, error } = await supabase.storage
         .from('event')
-        .upload(filePath, photo, { cacheControl: '3600', upsert: false });
+        .upload(filename, buffer, {
+          contentType: photo.type,
+        });
 
-      if (uploadError) return NextResponse.json({ message: uploadError.message }, { status: 500 });
+      if (error) {
+        throw new Error('Gagal upload foto');
+      }
 
-      const { data: urlData, error: urlError } = supabase.storage
-        .from('event')
-        .getPublicUrl(uploadData.path);
-
-      if (urlError) return NextResponse.json({ message: urlError.message }, { status: 500 });
-
-      uploadedPhotos.push(urlData.publicUrl);
+      const photoUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/event/${filename}`;
+      uploadedPhotos.push(photoUrl);
     }
 
-    const newEvent = await prisma.event.create({
+    // Simpan event baru
+    const event = await prisma.event.create({
       data: {
         name,
         slug,
-        date: dateArray,
         time,
         location,
-        guest,
         link,
         htm,
+        date: dates.map(d => new Date(d)),
         photos: uploadedPhotos,
-        Category: { connect: { id: foundCategory.id } },
+        categoryId,
+        guests: {
+          connect: guests.map(g => ({ id: g.id }))
+        },
       },
+      include: {
+        category: true,
+        guests: true
+      }
     });
 
-    return NextResponse.json(newEvent, { status: 201 });
-  } catch (err) {
-    console.error('[EVENT API ERROR]', err);
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(event, { status: 201 });
+  } catch (error) {
+    console.error('[EVENT API ERROR]', error);
+    return NextResponse.json(
+      { message: error.message || 'Terjadi kesalahan saat menambah event' },
+      { status: 500 }
+    );
   }
 }
 
 
-export async function GET() {
-    try {
-        const events = await prisma.Event.findMany({
-            orderBy: { date: 'asc' },
-            include: {
-                Category: true,
-            },
-        });
+export async function GET(req) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get('page')) || 1;
+    const limit = parseInt(searchParams.get('limit')) || 6;
+    const skip = (page - 1) * limit;
 
-        return NextResponse.json(events);
-    } catch (error) {
-        console.error('[GET EVENTS ERROR]', error);
-        return NextResponse.json({ error: 'Gagal mengambil data event' }, { status: 500 });
-    }
+    // Hitung total event
+    const total = await prisma.event.count();
+
+    // Ambil event dengan pagination
+    const events = await prisma.event.findMany({
+      skip,
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        category: true,
+        guests: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          }
+        }
+      },
+    });
+
+    return NextResponse.json({
+      message: 'Events retrieved successfully',
+      data: events,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
+
+  } catch (error) {
+    console.error('[GET EVENTS ERROR]', error);
+    return NextResponse.json({
+      message: 'Gagal mengambil data event',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    }, { status: 500 });
+  }
 }

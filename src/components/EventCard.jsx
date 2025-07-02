@@ -1,123 +1,125 @@
-"use client";
+'use client';
 
 import Link from 'next/link';
-import { Card, Badge, Row, Col, Button, Image } from 'react-bootstrap';
-import { Calendar, Clock, GeoAlt, CurrencyExchange } from 'react-bootstrap-icons';
-import { useAuth } from '@/app/context/AuthContext'; // sesuaikan path
-import { guestOptions } from '@/data/guestOptions';
+import { Card, Badge, Button, Image } from 'react-bootstrap';
+import { Calendar, Clock, GeoAlt } from 'react-bootstrap-icons';
+import '@/style/Event.css'; 
+import { useAuth } from '@/app/user/context/AuthContext';
 
 export default function EventCard({ event }) {
   const { user } = useAuth();
 
-  // Format date as string
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const options = { day: 'numeric', month: 'long', year: 'numeric' };
     return date.toLocaleDateString('id-ID', options);
   };
 
-  // Calculate the event duration
-  const getEventDuration = (dates) => {
-    const startDate = new Date(dates[0]);
-    const endDate = new Date(dates[dates.length - 1]);
-
-    const diffTime = Math.abs(endDate - startDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end day
-    return diffDays;
-  };
-
   return (
-    <Card className="mb-4 shadow-sm border-0 event-card">
-      <Card.Body>
-        <Row>
-          <Col md={3} className="mb-3 mb-md-0 text-center">
-            <div className="p-3 text-white rounded mb-3" style={{ backgroundColor: '#431006' }}>
-              <h3>{new Date(event.date[0]).getDate()}</h3>
-              <p className="mb-0">{formatDate(event.date[0]).split(',')[1]}</p>
-              <p className="mb-0">({getEventDuration(event.date)} Hari)</p> {/* Show event duration */}
-            </div>
+    <Card className="event-showcase-card">
+      {/* Header bar atas */}
+      <div className="event-header-bar" />
 
-            {event.photos && event.photos.length > 0 && (
-              <Image
-                src={event.photos[0]}
-                alt={event.name}
-                fluid
-                rounded
-                className="shadow-sm"
-              />
-            )}
-          </Col>
+      {/* Gambar Event */}
+      <div className="event-image-container">
+        {event.photos?.[0] ? (
+          <Card.Img
+            src={event.photos}
+            alt={event.name}
+            className="event-showcase-image"
+          />
+        ) : (
+          <div className="event-image-placeholder">
+            <div className="event-icon-wrapper">📷</div>
+            <small>No Image</small>
+          </div>
+        )}
 
-          <Col md={9}>
-            <h4 className="mb-2">{event.name}</h4>
-            <Badge bg="secondary" className="mb-3">{event.category}</Badge>
+        {event.htm && (
+          <div className="event-price-badge">
+            {event.htm}
+          </div>
+        )}
 
-            {/* Display all event dates */}
-            <div className="d-flex align-items-center mb-2">
-              <Calendar className="me-2" />
-              <span>{event.date.map(d => formatDate(d)).join(' & ')}</span> {/* Join all dates with ' & ' */}
-            </div>
+        <div className="event-gradient-overlay" />
+      </div>
 
-            <div className="d-flex align-items-center mb-2">
-              <Clock className="me-2" />
-              <span>{event.time}</span>
-            </div>
+      {/* Body */}
+      <Card.Body className="event-showcase-body">
+        <div className="event-category-slug">
+          {event.category?.name || 'Tanpa Kategori'}
+        </div>
 
-            <div className="d-flex align-items-center mb-3">
-              <GeoAlt className="me-2" />
-              <span>{event.location}</span>
-            </div>
+        <Card.Title className="event-showcase-title">
+          {event.name}
+        </Card.Title>
 
-            {Array.isArray(event.guest) && event.guest.length > 0 && (
-              <div className="mb-3">
-                <strong className="d-block mb-2">Guest Star:</strong>
-                <div className="d-flex flex-wrap gap-2">
-                  {event.guest.map((guestName, index) => {
-                    const guest = guestOptions.find(g => g.name === guestName);
-                    return guest ? (
-                      <div
-                        key={index}
-                        className="text-center"
-                        style={{ width: 60 }}
-                      >
-                        <Image
-                          src={guest.image}
-                          alt={guest.label}
-                          width={40}
-                          height={40}
-                          className="rounded-circle border border-secondary shadow-sm"
-                        />
-                        <div className="small mt-1">{guest.label}</div>
-                      </div>
-                    ) : (
-                      <Badge key={index} bg="secondary">{guestName}</Badge>
-                    );
-                  })}
+        {/* Info Date, Time, Location */}
+        <div className="event-details-info">
+          <div className="event-detail-item">
+            <Calendar className="event-detail-icon" />
+            {event.date.map((d) => formatDate(d)).join(' - ')}
+          </div>
+          <div className="event-detail-item">
+            <Clock className="event-detail-icon" />
+            {event.time}
+          </div>
+          <div className="event-detail-item">
+            <GeoAlt className="event-detail-icon" />
+            {event.location}
+          </div>
+        </div>
+
+        {/* Guest Star */}
+        {event.guests?.length > 0 && (
+          <div className="event-guest-section">
+            <span className="event-guest-title">Guest Star:</span>
+            <div className="event-guest-avatars">
+              {event.guests.slice(0, 4).map((guest, index) => (
+                <div key={index} className="event-guest-item">
+                  <Image
+                    src={guest.image}
+                    alt={guest.name}
+                    className="event-guest-avatar"
+                  />
+                  <div className="event-guest-name">
+                    {guest.name}
+                  </div>
                 </div>
-              </div>
-            )}
-
-            <div className="d-flex align-items-center mb-2">
-              <CurrencyExchange className="me-2" />
-              <span>{event.htm}</span>
+              ))}
+              {event.guests.length > 4 && (
+                <div className="event-guest-count-badge">
+                  +{event.guests.length - 4}
+                </div>
+              )}
             </div>
+          </div>
+        )}
 
+        {/* Tombol Aksi */}
+        <div className="event-showcase-actions">
+          <Button
+            as={Link}
+            href={`/user/event/${event.slug}`}
+            className="btn-event-detail"
+          >
+            Lihat Event
+          </Button>
+
+          {user && (
             <Button
               as={Link}
-              href={`/event/${event.slug}`}
-              variant='outline-danger'
-              className='me-2 button-animate'>
-              Lihat Event
+              href={`/admin/event/edit/${event.slug}`}
+              className="btn-event-edit"
+            >
+              Edit
             </Button>
-
-            {user && (
-              <Button as={Link} href={`/event/edit/${event.slug}`} variant="outline-warning">
-                Edit Event
-              </Button>
-            )}
-          </Col>
-        </Row>
+          )}
+        </div>
       </Card.Body>
+
+      {/* Footer bar bawah */}
+      <div className="event-footer-bar" />
     </Card>
   );
 }

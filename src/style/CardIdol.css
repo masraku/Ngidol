@@ -1,0 +1,176 @@
+.idol-card {
+  max-width: 280px;
+  width: 100%;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  transition: all 0.3s ease;
+  border: none;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.idol-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 25px rgba(139, 69, 19, 0.15);
+}
+
+.idol-header-bar {
+  background: linear-gradient(135deg, #8B4513, #A0522D, #CD853F);
+  height: 6px;
+}
+
+.idol-footer-bar {
+  height: 4px;
+  background: linear-gradient(90deg, #8B4513, #A0522D, #CD853F);
+}
+
+.idol-image-container {
+  position: relative;
+  height: 180px;
+  background: #f8f9fa;
+  border: 3px solid #8B4513;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+}
+
+.idol-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.idol-image:hover {
+  transform: scale(1.05);
+}
+
+.idol-image-placeholder {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #6c757d;
+}
+
+.icon-wrapper {
+  background-color: #8B4513;
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.idol-member-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  font-size: 10px;
+  font-weight: bold;
+  border-radius: 50%;
+  background-color: #8B4513;
+  color: white;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.idol-gradient-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background: linear-gradient(transparent, rgba(139, 69, 19, 0.1));
+  z-index: 5;
+}
+
+.idol-card-body {
+  padding: 1rem;
+  background: linear-gradient(135deg, #faf9f7 0%, #f5f3f0 100%);
+}
+
+.idol-slug {
+  display: inline-block;
+  background-color: rgba(139, 69, 19, 0.1);
+  color: #8B4513;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.idol-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #8B4513;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 1px 2px rgba(139, 69, 19, 0.1);
+}
+
+.idol-description {
+  font-size: 0.85rem;
+  color: #6c757d;
+  line-height: 1.4;
+  min-height: 35px;
+  margin-bottom: 0.75rem;
+}
+
+.idol-spotify-info {
+  display: flex;
+  align-items: center;
+  background-color: rgba(30, 215, 96, 0.1);
+  border: 1px solid rgba(30, 215, 96, 0.2);
+  padding: 0.4rem;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.icon-circle {
+  background-color: #1DB954;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.5rem;
+}
+
+.idol-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-idol-detail {
+  background-color: #8B4513;
+  border-color: #8B4513;
+  color: white;
+  font-weight: 500;
+}
+
+.btn-idol-detail:hover {
+  background-color: #A0522D;
+  border-color: #A0522D;
+}
+
+.btn-idol-edit {
+  font-weight: 500;
+  color: #8B4513;
+  border-color: #8B4513;
+}
+
+.btn-idol-edit:hover {
+  background-color: #8B4513;
+  color: white;
+}

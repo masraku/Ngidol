@@ -1,15 +1,16 @@
+import { headers } from 'next/headers';
 import EventDetailClient from '@/components/EventDetailClient';
-import axios from 'axios';
 
 export async function generateMetadata({ params }) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.muchitsujo.site';
-    const res = await axios.get(`${baseUrl}/api/event/${params.slug}`);
-    const event = res.data;
+    const host = headers().get('host');
+    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+    const res = await fetch(`${protocol}://${host}/api/event/${params.slug}`);
+    const event = await res.json();
 
     const imageUrl = event.photos?.[0]?.startsWith('http')
       ? event.photos[0]
-      : `${baseUrl}/assets/logo.svg`; // fallback kalau tidak ada foto
+      : `${protocol}://${host}/assets/logo.svg`;
 
     return {
       title: `${event.name} | EventKu`,
@@ -17,7 +18,7 @@ export async function generateMetadata({ params }) {
       openGraph: {
         title: `${event.name} | EventKu`,
         description: `${event.location} - ${event.time}`,
-        url: `${baseUrl}/event/${params.slug}`,
+        url: `${protocol}://${host}/event/${params.slug}`,
         type: 'website',
         images: [
           {
@@ -44,15 +45,19 @@ export async function generateMetadata({ params }) {
   }
 }
 
-
 export default async function EventDetailPage({ params }) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.muchitsujo.site/';
-    const res = await axios.get(`${baseUrl}/api/event/${params.slug}`);
-    const event = res.data;
+    const host = headers().get('host');
+    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+
+    const res = await fetch(`${protocol}://${host}/api/event/${params.slug}`, {
+      cache: 'no-store',
+    });
+    const event = await res.json();
 
     return <EventDetailClient event={event} />;
   } catch (error) {
+    console.error('[Page Error]', error);
     return (
       <div className="container py-5 text-center">
         <h2>Event tidak ditemukan</h2>
