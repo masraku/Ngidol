@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { supabase } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
+import { createNotification } from '@/lib/notification';
 
 
 export async function GET(req, { params }) {
@@ -126,9 +127,63 @@ export async function PUT(req, { params }) {
       }
     });
 
+    await createNotification({
+      message: `Event "${updatedEvent.name}" telah diperbarui`,
+      type: 'Event',
+      link: `/event/${updatedEvent.slug}`,
+    })
+
     return NextResponse.json({ message: "Berhasil update event", data: updatedEvent });
   } catch (error) {
     console.error("Gagal update event:", error);
     return NextResponse.json({ message: "Gagal update event", error: error.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(req, { params }) {
+  const slug = params.slug;
+
+  if (!slug) {
+    return NextResponse.json({ message: 'Slug tidak valid' }, { status: 400 });
+  }
+
+  try {
+    // Cari event berdasarkan slug
+    const event = await prisma.event.findUnique({
+      where: { slug },
+      select: { id: true, photos: true }
+    });
+
+    if (!event) {
+      return NextResponse.json({ message: 'Event tidak ditemukan' }, { status: 404 });
+    }
+
+    // Hapus foto dari Supabase jika ada
+    if (event.photos && event.photos.length > 0) {
+      const paths = event.photos.map((url) => {
+        const parts = url.split('/event/');
+        return parts[1] ? `event/${parts[1]}` : null;
+      }).filter(Boolean);
+
+      if (paths.length > 0) {
+        const { error: deleteError } = await supabase.storage
+          .from('event')
+          .remove(paths);
+
+        if (deleteError) {
+          console.error('Gagal hapus foto dari Supabase:', deleteError.message);
+        }
+      }
+    }
+
+    // Hapus event dari database
+    await prisma.event.delete({
+      where: { slug }
+    });
+
+    return NextResponse.json({ message: 'Event berhasil dihapus' });
+  } catch (error) {
+    console.error('Gagal menghapus event:', error);
+    return NextResponse.json({ message: 'Gagal menghapus event', error: error.message }, { status: 500 });
   }
 }

@@ -86,3 +86,12 @@ model Song {
   idolId     String
   idol       Idol   @relation(fields: [idolId], references: [id])
 }
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  type      String // e.g. "idol-add", "event-edit", etc.
+  message   String
+  link      String
+  createdAt DateTime @default(now())
+  read      Boolean  @default(false)
+}

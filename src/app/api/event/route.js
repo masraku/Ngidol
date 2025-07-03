@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import prisma from '@/lib/prisma';
 import { supabase } from '@/lib/supabase';
+import { createNotification } from '@/lib/notification';
 
 export async function POST(req) {
   try {
@@ -72,6 +73,11 @@ export async function POST(req) {
         guests: true
       }
     });
+    await createNotification({
+      message: `Event baru "${event.name}" telah dibuat`,
+      type: `Event`, 
+      link: `/admin/event/${event.slug}`,
+    })
 
     return NextResponse.json(event, { status: 201 });
   } catch (error) {

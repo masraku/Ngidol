@@ -2,14 +2,26 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Home, Users, Calendar, Settings, Plus } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Home, Users, Calendar, Settings, Plus, LogOut } from 'lucide-react';
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const router = useRouter();
 
   const isActive = (path) => pathname === path;
   const isParentActive = (paths) => paths.some(path => pathname.startsWith(path));
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+      router.push('/user');
+    } catch (error) {
+      console.error('Gagal logout:', error);
+    }
+  };
 
   return (
     <div className="sidebar">
@@ -76,6 +88,16 @@ const Sidebar = () => {
               Pengaturan
             </div>
           </Link>
+        </div>
+
+        {/* Logout */}
+        <div className="nav-item" style={{ marginTop: '1rem' }}>
+          <button onClick={handleLogout} className="nav-button logout-button">
+            <div className="nav-button-content">
+              <LogOut className="nav-icon" />
+              Logout
+            </div>
+          </button>
         </div>
       </nav>
     </div>

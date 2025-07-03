@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 import '@/style/EventForm.css';
 
 const EventForm = ({ isEdit = false, initialData = null, slug = null }) => {
@@ -28,6 +30,7 @@ const EventForm = ({ isEdit = false, initialData = null, slug = null }) => {
     const [selectedDates, setSelectedDates] = useState([]);
     const [dataLoading, setDataLoading] = useState(true);
     const fileInputRef = useRef(null);
+    const router = useRouter();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -145,10 +148,34 @@ const EventForm = ({ isEdit = false, initialData = null, slug = null }) => {
                 await axios.put(`/api/event/${slug}`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' },
                 });
+
+                // Notifikasi sukses dan redirect
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil Diperbarui',
+                    text: 'Event berhasil diperbarui!',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    router.push('/admin/event');
+                });
             } else {
                 await axios.post('/api/event', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' },
                 });
+
+                // Tambah event success
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil Ditambahkan',
+                    text: 'Event baru berhasil ditambahkan!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                setForm(initialForm);
+                setSelectedDates([]);
+                if (fileInputRef.current) fileInputRef.current.value = '';
             }
 
             setSuccess(true);
@@ -456,13 +483,14 @@ const EventForm = ({ isEdit = false, initialData = null, slug = null }) => {
                                             <div className="spinner-border spinner-border-sm me-2" role="status">
                                                 <span className="visually-hidden">Loading...</span>
                                             </div>
-                                            Menyimpan Event...
+                                            {isEdit ? 'Menyimpan Perubahan...' : 'Menyimpan Event...'}
                                         </div>
                                     ) : (
-                                        'Tambah Event'
+                                        isEdit ? 'Simpan Perubahan' : 'Tambah Event'
                                     )}
                                 </button>
                             </div>
+
                         </form>
                     </div>
                 </div>

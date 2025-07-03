@@ -1,0 +1,160 @@
+/* src/app/admin/dashboard/DashboardPage.css */
+
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.dashboard-card {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.dashboard-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.dashboard-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.dashboard-icon.purple {
+  color: #4f46e5;
+}
+.dashboard-icon.green {
+  color: #10b981;
+}
+.dashboard-icon.red {
+  color: #ef4444;
+}
+.dashboard-icon.yellow {
+  color: #f59e0b;
+}
+
+.dashboard-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.dashboard-text {
+  color: #4b5563;
+  font-size: 0.95rem;
+}
+
+.dashboard-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dashboard-activity-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f3f4f6;
+  padding-bottom: 0.5rem;
+}
+
+.dashboard-activity-item:last-child {
+  border-bottom: none;
+}
+
+.dashboard-activity-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dashboard-time {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+}
+
+.dot.green {
+  background-color: #10b981;
+}
+.dot.blue {
+  background-color: #3b82f6;
+}
+.dot.violet {
+  background-color: #8b5cf6;
+}
+.notification-wrapper {
+  position: relative;
+}
+
+.notification-dropdown {
+  position: absolute;
+  top: 2.5rem;
+  right: 0;
+  width: 280px;
+  background: white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  z-index: 50;
+  padding: 1rem;
+}
+
+.notification-badge {
+  background-color: red;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.notif-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+}
+
+.notif-item {
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.notif-item:hover {
+  background-color: #f2f2f2;
+}
+
+.notif-empty {
+  font-size: 0.9rem;
+  color: #999;
+}
+

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Upload } from 'lucide-react';
 import slugify from 'slugify';
@@ -13,6 +13,21 @@ export default function AddIdolPage() {
   const [members, setMembers] = useState([]);
   const [songs, setSongs] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState('');
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch('/api/event/category');
+        const data = await res.json();
+        setCategories(data);
+      } catch (err) {
+        console.error('Gagal memuat kategori', err);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleIdolChange = (e) => {
     const { name, value } = e.target;
@@ -74,6 +89,8 @@ export default function AddIdolPage() {
       formData.append('slug', slugify(idol.name, { lower: true }));
       formData.append('description', idol.description);
       formData.append('sosmeds', JSON.stringify(idol.sosmeds));
+      formData.append('categoryId', selectedCategoryId);
+
       if (imageFile) formData.append('image', imageFile);
 
       formData.append(
@@ -98,7 +115,7 @@ export default function AddIdolPage() {
 
       if (res.ok) {
         Swal.fire('Berhasil!', 'Idol berhasil ditambahkan.', 'success').then(() => {
-          router.push('/idol');
+          router.push('/admin/idol');
         });
       } else {
         const err = await res.json();
@@ -126,6 +143,23 @@ export default function AddIdolPage() {
               className="input"
               required
             />
+          </div>
+
+          <div>
+            <label className="label">Kategori *</label>
+            <select
+              value={selectedCategoryId}
+              onChange={(e) => setSelectedCategoryId(e.target.value)}
+              className="input"
+              required
+            >
+              <option value="" disabled>Pilih Kategori</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>

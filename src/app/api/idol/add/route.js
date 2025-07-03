@@ -2,11 +2,17 @@ import { NextResponse } from 'next/server';
 import prisma from '@/app/lib/prisma';
 import supabase from '@/app/lib/supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
+import { createNotification } from '@/lib/notification';
 
 export async function POST(req) {
   try {
     const formData = await req.formData();
+    const categoryIdRaw = formData.get('categoryId');
+    const categoryId = parseInt(categoryIdRaw, 10); // ubah ke integer
 
+    if (!categoryId) {
+      return NextResponse.json({ error: 'Kategori wajib dipilih' }, { status: 400 });
+    }
     const name = formData.get('name');
     const slug = formData.get('slug');
     const description = formData.get('description');
@@ -88,6 +94,7 @@ export async function POST(req) {
       data: {
         name,
         slug,
+        categoryId,
         description,
         sosmeds,
         image: idolImageUrl,
@@ -102,6 +109,12 @@ export async function POST(req) {
         },
       },
       include: { members: true, songs: true },
+    });
+
+    await createNotification({
+      message: `Idol baru "${createdIdol.name}" telah ditambahkan`,
+      type: 'Idol',
+      link: `/idol/${createdIdol.slug}`,
     });
 
     return NextResponse.json(createdIdol, { status: 201 });

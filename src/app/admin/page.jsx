@@ -1,89 +1,121 @@
+'use client';
+import '@/style/Dashboard.css';
 import { Users, Calendar, Heart, Star } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function DashboardPage() {
+  const [idols, setIdols] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [idolsRes, eventsRes, notifsRes] = await Promise.all([
+          fetch('/api/idol'),
+          fetch('/api/event'),
+          fetch('/api/notification')
+        ]);
+
+        const idolsData = await idolsRes.json();
+        const eventsData = await eventsRes.json();
+        const notifsData = await notifsRes.json();
+
+        setIdols(idolsData);
+        setEvents(eventsData.data || []);
+        setNotifications(notifsData.data || []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const formatTimeAgo = (timestamp) => {
+    const now = new Date();
+    const date = new Date(timestamp);
+    const diff = Math.floor((now - date) / 1000); // in seconds
+
+    if (diff < 60) return `${diff} detik lalu`;
+    if (diff < 3600) return `${Math.floor(diff / 60)} menit lalu`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} jam lalu`;
+    return `${Math.floor(diff / 86400)} hari lalu`;
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="dashboard-container">
       {/* Stats Cards */}
-      <div className="grid grid-cols-4">
-        <div className="card p-6">
-          <div className="flex items-center justify-between">
+      <div className="dashboard-grid">
+        <div className="dashboard-card">
+          <div className="dashboard-card-content">
             <div>
-              <p className="text-gray-600 text-sm">Total Idol</p>
-              <p className="text-2xl font-bold text-gray-800">156</p>
+              <p className="dashboard-label">Total Idol</p>
+              <p className="dashboard-value">{idols.length}</p>
             </div>
-            <Users style={{width: '2rem', height: '2rem', color: '#4f46e5'}} />
+            <Users className="dashboard-icon purple" />
           </div>
         </div>
-        
-        <div className="card p-6">
-          <div className="flex items-center justify-between">
+
+        <div className="dashboard-card">
+          <div className="dashboard-card-content">
             <div>
-              <p className="text-gray-600 text-sm">Event Aktif</p>
-              <p className="text-2xl font-bold text-gray-800">23</p>
+              <p className="dashboard-label">Total Event</p>
+              <p className="dashboard-value">{events.length}</p>
             </div>
-            <Calendar style={{width: '2rem', height: '2rem', color: '#10b981'}} />
+            <Calendar className="dashboard-icon green" />
           </div>
         </div>
-        
-        <div className="card p-6">
-          <div className="flex items-center justify-between">
+
+        <div className="dashboard-card">
+          <div className="dashboard-card-content">
             <div>
-              <p className="text-gray-600 text-sm">Total Followers</p>
-              <p className="text-2xl font-bold text-gray-800">2.4M</p>
+              <p className="dashboard-label">Total Followers</p>
+              <p className="dashboard-value">2.4M</p>
             </div>
-            <Heart style={{width: '2rem', height: '2rem', color: '#ef4444'}} />
+            <Heart className="dashboard-icon red" />
           </div>
         </div>
-        
-        <div className="card p-6">
-          <div className="flex items-center justify-between">
+
+        <div className="dashboard-card">
+          <div className="dashboard-card-content">
             <div>
-              <p className="text-gray-600 text-sm">Rating</p>
-              <p className="text-2xl font-bold text-gray-800">4.8</p>
+              <p className="dashboard-label">Rating</p>
+              <p className="dashboard-value">4.8</p>
             </div>
-            <Star style={{width: '2rem', height: '2rem', color: '#f59e0b'}} />
+            <Star className="dashboard-icon yellow" />
           </div>
         </div>
       </div>
-      
+
       {/* Welcome Section */}
-      <div className="card p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">
-          Selamat Datang di Muchitsujo Admin
-        </h3>
-        <p className="text-gray-600">
-          Kelola idol dan event Anda dengan mudah melalui dashboard ini. 
+      <div className="dashboard-card">
+        <h3 className="dashboard-title">Selamat Datang di Muchitsujo Admin</h3>
+        <p className="dashboard-text">
+          Kelola idol dan event Anda dengan mudah melalui dashboard ini.
           Gunakan menu sidebar untuk navigasi ke berbagai fitur yang tersedia.
         </p>
       </div>
 
       {/* Recent Activity */}
-      <div className="card p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">
-          Aktivitas Terbaru
-        </h3>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between" style={{paddingBottom: '0.5rem', borderBottom: '1px solid #f3f4f6'}}>
-            <div className="flex items-center">
-              <div style={{width: '0.5rem', height: '0.5rem', backgroundColor: '#10b981', borderRadius: '50%', marginRight: '0.75rem'}}></div>
-              <span className="text-gray-700">Idol baru "Sakura Miyuki" ditambahkan</span>
-            </div>
-            <span className="text-sm text-gray-600">2 jam lalu</span>
-          </div>
-          <div className="flex items-center justify-between" style={{paddingBottom: '0.5rem', borderBottom: '1px solid #f3f4f6'}}>
-            <div className="flex items-center">
-              <div style={{width: '0.5rem', height: '0.5rem', backgroundColor: '#3b82f6', borderRadius: '50%', marginRight: '0.75rem'}}></div>
-              <span className="text-gray-700">Event "Summer Festival 2025" diupdate</span>
-            </div>
-            <span className="text-sm text-gray-600">5 jam lalu</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div style={{width: '0.5rem', height: '0.5rem', backgroundColor: '#8b5cf6', borderRadius: '50%', marginRight: '0.75rem'}}></div>
-              <span className="text-gray-700">3 event baru telah dijadwalkan</span>
-            </div>
-            <span className="text-sm text-gray-600">1 hari lalu</span>
-          </div>
+      <div className="dashboard-card">
+        <h3 className="dashboard-title">Aktivitas Terbaru</h3>
+        <div className="dashboard-activity-list">
+          {notifications.length === 0 ? (
+            <p className="dashboard-text">Belum ada aktivitas terbaru.</p>
+          ) : (
+            notifications
+              .slice(0, 5)
+              .map((notif) => (
+                <div key={notif.id} className="dashboard-activity-item">
+                  <div className="dashboard-activity-info">
+                    <div className={`dot ${notif.type === 'idol' ? 'green' : notif.type === 'event' ? 'blue' : 'violet'}`} />
+                    <span className="dashboard-text">{notif.message}</span>
+                  </div>
+                  <span className="dashboard-time">{formatTimeAgo(notif.createdAt)}</span>
+                </div>
+              ))
+          )}
         </div>
       </div>
     </div>
