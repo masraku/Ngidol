@@ -1,6 +1,7 @@
 import { Inter } from 'next/font/google';
 import '@/style/globals.css';
 import '@/style/Event.css'
+import '@/style/MyPage.css';
 import BootstrapClient from '@/components/BootstrapClient';
 import Navbar from '@/components/Navbar';
 import { AuthProvider } from './context/AuthContext';

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/app/user/context/AuthContext';
-import { Navbar, Container, Nav, Button } from 'react-bootstrap';
+import { Navbar, Container, Nav, Button, NavDropdown } from 'react-bootstrap';
 import Image from 'next/image';
 
 export default function NavbarComponent() {
@@ -35,7 +35,7 @@ export default function NavbarComponent() {
       <Container>
         <Navbar.Brand as={Link} href="/user">
           <Image
-            src="/assets/logo.svg"
+            src="/assets/muchit.svg"
             alt="Logo"
             width={250}
             height={125}
@@ -81,13 +81,31 @@ export default function NavbarComponent() {
             >
               Idoru
             </Nav.Link>
-            <Nav.Link
-              as={Link}
-              href="/user/auth"
-              className={`nav-link-custom ${isActive('/user/auth') ? 'active-link' : ''}`}
-            >
-              Login
-            </Nav.Link>
+
+            {user ? (
+              <NavDropdown
+                title={`Hai, ${user.name}`}
+                id="user-nav-dropdown"
+                align="end"
+                className="nav-link-custom"
+              >
+                <NavDropdown.Item as={Link} href="/user/mypage">
+                  My Page
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item onClick={handleLogout}>
+                  Logout
+                </NavDropdown.Item>
+              </NavDropdown>
+            ) : (
+              <Nav.Link
+                as={Link}
+                href="/user/auth"
+                className={`nav-link-custom ${isActive('/user/auth') ? 'active-link' : ''}`}
+              >
+                Login
+              </Nav.Link>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>

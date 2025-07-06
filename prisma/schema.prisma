@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,6 +6,37 @@ datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Preferences - categories yang user suka
+  favoriteCategories Category[] @relation("UserFavoriteCategories")
+  
+  // Preferences - idols yang user suka
+  favoriteIdols Idol[] @relation("UserFavoriteIdols")
+  
+  // Preferences - members yang user suka
+  favoriteMembers Member[] @relation("UserFavoriteMembers")
+  
+  // Saved events - events yang user simpan
+  savedEvents Event[] @relation("UserSavedEvents")
+  
+  // Email preferences
+  emailNotifications Boolean @default(true)
+  eventReminders     Boolean @default(true)
+
+  // Notifications received by the user
+  notifications Notification[]
+
+  // Email logs sent to the user
+  emailLogs EmailLog[]
 }
 
 model Event {
@@ -30,15 +55,24 @@ model Event {
   categoryId Int?
 
   guests Idol[] @relation("EventGuests")
+  
+  // Users yang save event ini
+  savedByUsers User[] @relation("UserSavedEvents")
+
+  // Email logs related to this event
+  emailLogs EmailLog[]
 }
 
 model Category {
   id        Int      @id @default(autoincrement())
   name      String   @unique
   event     Event[]
-  idols     Idol[] // Relation field to Idol
+  idols     Idol[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  // Users yang suka kategori ini
+  favoritedByUsers User[] @relation("UserFavoriteCategories")
 }
 
 model Admin {
@@ -65,7 +99,10 @@ model Idol {
   members Member[]
   songs   Song[]
 
-  events Event[] @relation("EventGuests") // many-to-many relasi
+  events Event[] @relation("EventGuests")
+  
+  // Users yang suka idol ini
+  favoritedByUsers User[] @relation("UserFavoriteIdols")
 }
 
 model Member {
@@ -77,6 +114,9 @@ model Member {
   X           String?
   idolId      String
   idol        Idol    @relation(fields: [idolId], references: [id])
+  
+  // Users yang suka member ini
+  favoritedByUsers User[] @relation("UserFavoriteMembers")
 }
 
 model Song {
@@ -89,9 +129,25 @@ model Song {
 
 model Notification {
   id        Int      @id @default(autoincrement())
-  type      String // e.g. "idol-add", "event-edit", etc.
+  type      String // e.g. "idol-add", "event-edit", "new-event", "event-reminder"
   message   String
   link      String
   createdAt DateTime @default(now())
   read      Boolean  @default(false)
+  
+  // Optional: jika notification untuk user spesifik
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+// Optional: Model untuk tracking email yang sudah dikirim
+model EmailLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  eventId   Int?
+  event     Event?   @relation(fields: [eventId], references: [id])
+  type      String   // "event-notification", "event-reminder"
+  sentAt    DateTime @default(now())
+  status    String   // "sent", "failed", "pending"
 }

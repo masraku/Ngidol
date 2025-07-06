@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import supabase from '@/app/lib/supabaseClient';
+import { supabaseServerClient } from '@/lib/supabase'; 
 import { v4 as uuidv4 } from 'uuid';
 import { createNotification } from '@/lib/notification';
 
@@ -8,11 +8,12 @@ export async function POST(req) {
   try {
     const formData = await req.formData();
     const categoryIdRaw = formData.get('categoryId');
-    const categoryId = parseInt(categoryIdRaw, 10); // ubah ke integer
+    const categoryId = parseInt(categoryIdRaw, 10);
 
     if (!categoryId) {
       return NextResponse.json({ error: 'Kategori wajib dipilih' }, { status: 400 });
     }
+
     const name = formData.get('name');
     const slug = formData.get('slug');
     const description = formData.get('description');
@@ -21,7 +22,6 @@ export async function POST(req) {
     const members = JSON.parse(formData.get('members') || '[]');
     const songs = JSON.parse(formData.get('songs') || '[]');
 
-    // Parse sosmeds array
     let sosmeds = [];
     try {
       sosmeds = JSON.parse(sosmedsRaw || '[]');
@@ -29,21 +29,18 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Format sosmed tidak valid' }, { status: 400 });
     }
 
-    // Validasi wajib
     if (!name || !slug || !description || !imageFile || typeof imageFile !== 'object') {
       return NextResponse.json({ error: 'Field wajib tidak boleh kosong' }, { status: 400 });
     }
 
-    // Cek slug unik
     const existing = await prisma.idol.findUnique({ where: { slug } });
     if (existing) {
       return NextResponse.json({ error: 'Slug sudah digunakan' }, { status: 400 });
     }
 
-    // Upload foto idol ke Supabase
     const idolImageName = `idol/${uuidv4()}-${imageFile.name}`;
     const arrayBuffer = await imageFile.arrayBuffer();
-    const { error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabaseServerClient.storage
       .from('idol')
       .upload(idolImageName, Buffer.from(arrayBuffer), {
         contentType: imageFile.type,
@@ -54,10 +51,9 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Gagal upload gambar idol' }, { status: 500 });
     }
 
-    const { data: idolImageUrlData } = supabase.storage.from('idol').getPublicUrl(idolImageName);
+    const { data: idolImageUrlData } = supabaseServerClient.storage.from('idol').getPublicUrl(idolImageName);
     const idolImageUrl = idolImageUrlData.publicUrl;
 
-    // Upload gambar member
     const uploadedMembers = await Promise.all(
       members.map(async (member, i) => {
         const file = formData.get(`memberImage-${i}`);
@@ -67,14 +63,14 @@ export async function POST(req) {
           const fileName = `member/${uuidv4()}-${file.name}`;
           const buffer = await file.arrayBuffer();
 
-          const { error: memberUploadErr } = await supabase.storage
+          const { error: memberUploadErr } = await supabaseServerClient.storage
             .from('idol')
             .upload(fileName, Buffer.from(buffer), { contentType: file.type });
 
           if (memberUploadErr) {
             console.error('Gagal upload foto member:', memberUploadErr);
           } else {
-            const { data: urlData } = supabase.storage.from('idol').getPublicUrl(fileName);
+            const { data: urlData } = supabaseServerClient.storage.from('idol').getPublicUrl(fileName);
             imageUrl = urlData.publicUrl;
           }
         }
@@ -89,7 +85,6 @@ export async function POST(req) {
       })
     );
 
-    // Simpan ke database
     const createdIdol = await prisma.idol.create({
       data: {
         name,

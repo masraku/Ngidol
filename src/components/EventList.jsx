@@ -90,8 +90,8 @@ export default function EventList() {
     <Container fluid className="py-5 bg-light">
       <Row className="justify-content-center mb-4">
         <Col md={8} className="text-center">
-          <h1 className="display-4 fw-bold mb-3">Muchitsujo Event</h1>
-          <p className="lead text-muted">kemana kita?</p>
+          <h1 className="display-4 fw-bold mb-3">Dari konser hingga cosplay</h1>
+          <p className="lead text-muted">Gabut? Bingung weekend mau ke mana? semua event seru ada di sini.</p>
         </Col>
       </Row>
 

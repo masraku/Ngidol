@@ -5,37 +5,43 @@ import { createContext, useContext, useState, useEffect } from "react";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null);       // Menyimpan data user/admin + role
+  const [loading, setLoading] = useState(true); // Optional: untuk state loading
 
-    const fetchUser = async () => {
-        try {
-            const res = await fetch('/api/auth', {
-                credentials: 'include', // penting agar cookie keikut
-            });
-            const data = await res.json();
+  const fetchUser = async () => {
+    try {
+      setLoading(true);
 
-            if (res.ok) {
-                setUser(data.admin); // sesuaikan dengan response API kamu
-            } else {
-                setUser(null);
-            }
-        } catch (err) {
-            console.error('fetchUser error:', err);
-            setUser(null);
-        }
-    };
+      const res = await fetch("/api/auth/login", {
+        credentials: "include", // agar cookie JWT ikut
+      });
 
-    useEffect(() => {
-        fetchUser();
-    }, []);
+      const data = await res.json();
 
-    return (
-        <AuthContext.Provider value={{ user, setUser, fetchUser }}>
-            {children}
-        </AuthContext.Provider>
-    );
+      if (res.ok && data.success) {
+        setUser({ ...data.user, role: data.role });
+      } else {
+        setUser(null);
+      }
+    } catch (err) {
+      console.error("fetchUser error:", err);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ user, setUser, fetchUser, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {
-    return useContext(AuthContext);
+  return useContext(AuthContext);
 }

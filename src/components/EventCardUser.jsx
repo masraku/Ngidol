@@ -1,13 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, Badge, Button, Image } from 'react-bootstrap';
-import { Calendar, Clock, GeoAlt } from 'react-bootstrap-icons';
-import '@/style/Event.css'; 
+import { useState, useEffect } from 'react';
+import { Card, Badge, Button, Image, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Calendar, Clock, GeoAlt, Bookmark, BookmarkCheck } from 'react-bootstrap-icons';
+import '@/style/Event.css';
 import { useAuth } from '@/app/user/context/AuthContext';
 
 export default function EventCard({ event }) {
   const { user } = useAuth();
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -15,9 +18,46 @@ export default function EventCard({ event }) {
     return date.toLocaleDateString('id-ID', options);
   };
 
+  useEffect(() => {
+    const checkSavedStatus = async () => {
+      if (!user) return;
+
+      const res = await fetch(`/api/user/events/${event.id}/saved`, {
+        credentials: 'include'
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setSaved(data.saved); // misal: { saved: true }
+      }
+    };
+
+    checkSavedStatus();
+  }, [user]);
+
+  const handleSaveEvent = async () => {
+    if (!user || saving) return;
+
+    try {
+      setSaving(true);
+      const response = await fetch(`/api/user/events/${event.id}/save`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
+
+      if (!response.ok) throw new Error('Gagal menyimpan event');
+      setSaved(true);
+    } catch (err) {
+      console.error('Save event failed:', err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <Card className="event-showcase-card">
-      {/* Header bar atas */}
+      {/* Header */}
       <div className="event-header-bar" />
 
       {/* Gambar Event */}
@@ -97,7 +137,7 @@ export default function EventCard({ event }) {
         )}
 
         {/* Tombol Aksi */}
-        <div className="event-showcase-actions">
+        <div className="event-showcase-actions d-flex justify-content-between align-items-center">
           <Button
             as={Link}
             href={`/user/event/${event.slug}`}
@@ -105,10 +145,28 @@ export default function EventCard({ event }) {
           >
             Lihat Event
           </Button>
+
+          {/* Tombol Simpan */}
+          {user?.role === 'user' && (
+            <OverlayTrigger
+              overlay={
+                <Tooltip>{saved ? 'Sudah Disimpan' : 'Simpan Event'}</Tooltip>
+              }
+            >
+              <Button
+                variant={saved ? 'success' : 'outline-primary'}
+                size="sm"
+                onClick={handleSaveEvent}
+                disabled={saving || saved}
+              >
+                {saved ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
+              </Button>
+            </OverlayTrigger>
+          )}
         </div>
       </Card.Body>
 
-      {/* Footer bar bawah */}
+      {/* Footer */}
       <div className="event-footer-bar" />
     </Card>
   );

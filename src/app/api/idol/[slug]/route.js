@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { supabase } from '@/lib/supabase';
+import { supabaseServerClient as supabase } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
 import { createNotification } from '@/lib/notification';
 

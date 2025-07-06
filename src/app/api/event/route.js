@@ -1,8 +1,7 @@
-// src/app/api/event/route.js
 import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import prisma from '@/lib/prisma';
-import { supabase } from '@/lib/supabase';
+import { supabaseServerClient as supabase } from '@/lib/supabase'; // ✅ pakai server-side supabase
 import { createNotification } from '@/lib/notification';
 
 export async function POST(req) {
@@ -21,10 +20,10 @@ export async function POST(req) {
     const photos = formData.getAll('photos');
 
     // Parse array field
-    const dates = JSON.parse(dateRaw); // array of date string
-    const guests = JSON.parse(guestRaw); // array of { id, name, image, etc. }
+    const dates = JSON.parse(dateRaw);
+    const guests = JSON.parse(guestRaw);
 
-    // Ambil ID kategori (bukan nama)
+    // Ambil ID kategori
     let categoryId = null;
     if (categoryName) {
       const category = await prisma.category.findUnique({
@@ -38,7 +37,7 @@ export async function POST(req) {
     for (const photo of photos) {
       const buffer = Buffer.from(await photo.arrayBuffer());
       const filename = `event/${Date.now()}-${uuidv4()}`;
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from('event')
         .upload(filename, buffer, {
           contentType: photo.type,
@@ -48,11 +47,11 @@ export async function POST(req) {
         throw new Error('Gagal upload foto');
       }
 
-      const photoUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/event/${filename}`;
-      uploadedPhotos.push(photoUrl);
+      const { data: publicUrlData } = supabase.storage.from('event').getPublicUrl(filename);
+      uploadedPhotos.push(publicUrlData.publicUrl);
     }
 
-    // Simpan event baru
+    // Simpan event ke database
     const event = await prisma.event.create({
       data: {
         name,
@@ -73,11 +72,12 @@ export async function POST(req) {
         guests: true
       }
     });
+
     await createNotification({
       message: `Event baru "${event.name}" telah dibuat`,
-      type: `Event`, 
+      type: `Event`,
       link: `/admin/event/${event.slug}`,
-    })
+    });
 
     return NextResponse.json(event, { status: 201 });
   } catch (error) {
@@ -89,7 +89,6 @@ export async function POST(req) {
   }
 }
 
-
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
@@ -97,10 +96,8 @@ export async function GET(req) {
     const limit = parseInt(searchParams.get('limit')) || 6;
     const skip = (page - 1) * limit;
 
-    // Hitung total event
     const total = await prisma.event.count();
 
-    // Ambil event dengan pagination
     const events = await prisma.event.findMany({
       skip,
       take: limit,
