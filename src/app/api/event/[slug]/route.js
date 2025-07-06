@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { supabaseClient } from '@/lib/supabase';
+import { supabaseClient as supabase } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
 import { createNotification } from '@/lib/notification';
 
-const supabase = supabaseClient();
 
 export async function GET(req, { params }) {
   const slug = params.slug;
