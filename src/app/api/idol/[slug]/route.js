@@ -35,65 +35,56 @@ export async function PATCH(req, { params }) {
   try {
     const formData = await req.formData();
 
-    // Debug log formData
-    for (const [key, value] of formData.entries()) {
-      if (value instanceof File) {
-        console.log(`📝 ${key}: [FILE] ${value.name}`);
-      } else {
-        console.log(`📝 ${key}:`, value);
-      }
+    // --- Get all fields ---
+    const name = formData.get('name')?.toString();
+    const description = formData.get('description')?.toString();
+    const newSlug = formData.get('slug')?.toString();
+    const imageFile = formData.get('image');
+    const categoryIdRaw = formData.get('categoryId')?.toString();
+
+    if (!name || !newSlug) {
+      return NextResponse.json({ error: 'Nama dan slug wajib diisi' }, { status: 400 });
     }
 
-    const name = formData.get('name');
-    const description = formData.get('description');
-    const newSlug = formData.get('slug');
-    const imageFile = formData.get('image');
-
-    // Parse sosmed
+    // --- Sosmed ---
     let sosmeds = [];
     try {
       sosmeds = JSON.parse(formData.get('sosmeds') || '[]');
     } catch (e) {
-      console.error('❌ Gagal parse sosmeds:', e);
       return NextResponse.json({ error: 'Format sosmed tidak valid' }, { status: 400 });
     }
 
-    // Parse members
+    // --- Members ---
     let members = [];
     try {
       members = JSON.parse(formData.get('members') || '[]');
     } catch (e) {
-      console.error('❌ Gagal parse members:', e);
       return NextResponse.json({ error: 'Format member tidak valid' }, { status: 400 });
     }
 
-    // Parse songs
+    // --- Songs ---
     let songs = [];
     try {
       songs = JSON.parse(formData.get('songs') || '[]');
     } catch (e) {
-      console.error('❌ Gagal parse songs:', e);
       return NextResponse.json({ error: 'Format lagu tidak valid' }, { status: 400 });
     }
 
-    // Parse categoryId
-    const categoryIdRaw = formData.get('categoryId');
-    const categoryId = categoryIdRaw && categoryIdRaw !== '' ? parseInt(categoryIdRaw, 10) : null;
+    const categoryId = categoryIdRaw ? parseInt(categoryIdRaw, 10) : null;
     if (categoryIdRaw && isNaN(categoryId)) {
-      console.error('❌ categoryId tidak valid:', categoryIdRaw);
       return NextResponse.json({ error: 'Kategori tidak valid' }, { status: 400 });
     }
 
-    // Upload idol image jika ada
+    // --- Upload Idol Image if Exists ---
     let imageUrl = null;
     if (imageFile && typeof imageFile.name === 'string') {
-      const fileExt = imageFile.name.split('.').pop();
-      const fileName = `idol-${uuidv4()}.${fileExt}`;
-      const arrayBuffer = await imageFile.arrayBuffer();
+      const ext = imageFile.name.split('.').pop();
+      const fileName = `idol-${uuidv4()}.${ext}`;
+      const buffer = Buffer.from(await imageFile.arrayBuffer());
 
       const { error } = await supabase.storage
         .from('idol')
-        .upload(fileName, Buffer.from(arrayBuffer), {
+        .upload(fileName, buffer, {
           cacheControl: '3600',
           upsert: false,
           contentType: imageFile.type,
@@ -107,7 +98,7 @@ export async function PATCH(req, { params }) {
       imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/idol/${fileName}`;
     }
 
-    // Update idol
+    // --- Update Idol ---
     const updatedIdol = await prisma.idol.update({
       where: { slug },
       data: {
@@ -120,60 +111,65 @@ export async function PATCH(req, { params }) {
       },
     });
 
-    // Hapus member dan tambah ulang
-    await prisma.member.deleteMany({ where: { idolId: updatedIdol.id } });
+    // --- Delete old members and songs (in parallel) ---
+    await Promise.all([
+      prisma.member.deleteMany({ where: { idolId: updatedIdol.id } }),
+      prisma.song.deleteMany({ where: { idolId: updatedIdol.id } }),
+    ]);
 
-    for (let i = 0; i < members.length; i++) {
-      const m = members[i];
-      let image = m.image;
+    // --- Upload Member Images in Parallel ---
+    const uploadedMemberImages = await Promise.all(
+      members.map(async (m, i) => {
+        const memberImageFile = formData.get(`memberImage-${i}`);
+        if (memberImageFile && typeof memberImageFile.name === 'string') {
+          const ext = memberImageFile.name.split('.').pop();
+          const fileName = `member-${uuidv4()}.${ext}`;
+          const buffer = Buffer.from(await memberImageFile.arrayBuffer());
 
-      const memberImageFile = formData.get(`memberImage-${i}`);
-      if (memberImageFile && typeof memberImageFile.name === 'string') {
-        const ext = memberImageFile.name.split('.').pop();
-        const fileName = `member-${uuidv4()}.${ext}`;
-        const buffer = await memberImageFile.arrayBuffer();
+          const { error } = await supabase.storage
+            .from('idol')
+            .upload(fileName, buffer, {
+              cacheControl: '3600',
+              upsert: false,
+              contentType: memberImageFile.type,
+            });
 
-        const { error } = await supabase.storage
-          .from('idol')
-          .upload(fileName, Buffer.from(buffer), {
-            cacheControl: '3600',
-            upsert: false,
-            contentType: memberImageFile.type,
-          });
+          if (error) {
+            console.error(`❌ Gagal upload gambar member ${m.name}:`, error.message || error);
+            throw new Error(`Gagal upload gambar member: ${m.name}`);
+          }
 
-        if (error) {
-          console.error(`❌ Gagal upload gambar member ${m.name}:`, error.message || error);
-          return NextResponse.json({ error: `Gagal upload gambar member: ${m.name}` }, { status: 500 });
+          return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/idol/${fileName}`;
         }
 
-        image = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/idol/${fileName}`;
-      }
+        return m.image || null;
+      })
+    );
 
-      await prisma.member.create({
-        data: {
-          idolId: updatedIdol.id,
-          name: m.name,
-          image,
-          description: m.description,
-          instagram: m.instagram,
-          X: m.X,
-        },
-      });
-    }
+    // --- Create Member Entries ---
+    await prisma.member.createMany({
+      data: members.map((m, i) => ({
+        idolId: updatedIdol.id,
+        name: m.name,
+        image: uploadedMemberImages[i],
+        description: m.description,
+        instagram: m.instagram,
+        X: m.X,
+      })),
+    });
 
-    // Hapus dan tambah ulang lagu
-    await prisma.song.deleteMany({ where: { idolId: updatedIdol.id } });
-
-    for (let s of songs) {
-      await prisma.song.create({
-        data: {
+    // --- Create Songs ---
+    if (songs.length > 0) {
+      await prisma.song.createMany({
+        data: songs.map((s) => ({
           idolId: updatedIdol.id,
           title: s.title,
           spotifyUrl: s.spotifyUrl,
-        },
+        })),
       });
     }
 
+    // --- Create Notification ---
     await createNotification({
       message: `Idol "${updatedIdol.name}" telah diperbarui`,
       type: 'Idol',

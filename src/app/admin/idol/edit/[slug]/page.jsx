@@ -255,31 +255,49 @@ export default function EditIdolPage() {
                             />
                         </div>
 
-                        <label
-                            className="dropzone"
-                            onDragOver={(e) => e.preventDefault()}
-                            onDrop={(e) => {
-                                e.preventDefault();
-                                handleMemberImageChange(i, e.dataTransfer.files[0]);
-                            }}
-                        >
-                            {member.imageFile ? (
-                                <img src={URL.createObjectURL(member.imageFile)} alt="Preview" />
-                            ) : member.image ? (
-                                <img src={member.image} alt="Preview" />
-                            ) : (
-                                <div className="dropzone-placeholder">
-                                    <Upload className="mx-auto mb-2 w-6 h-6" />
-                                    <p>Klik / Drag foto</p>
-                                </div>
-                            )}
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => handleMemberImageChange(i, e.target.files[0])}
-                                hidden
-                            />
-                        </label>
+                        <div>
+                            <label
+                                className="dropzone"
+                                onDragOver={(e) => e.preventDefault()}
+                                onDrop={(e) => {
+                                    e.preventDefault();
+                                    handleMemberImageChange(i, e.dataTransfer.files[0]);
+                                }}
+                            >
+                                {member.imageFile ? (
+                                    <img src={URL.createObjectURL(member.imageFile)} alt="Preview" />
+                                ) : member.image ? (
+                                    <img src={member.image} alt="Preview" />
+                                ) : (
+                                    <div className="dropzone-placeholder">
+                                        <Upload className="mx-auto mb-2 w-6 h-6" />
+                                        <p>Klik / Drag foto</p>
+                                    </div>
+                                )}
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => handleMemberImageChange(i, e.target.files[0])}
+                                    hidden
+                                />
+                            </label>
+
+                            {/* Pindahkan tombol hapus ke bawah */}
+                            <div className="text-center mt-2">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const updated = [...members];
+                                        updated.splice(i, 1);
+                                        setMembers(updated);
+                                    }}
+                                    className="btn btn-sm btn-outline-danger"
+                                >
+                                    Hapus Member Ini
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
                 ))}
                 <button type="button" onClick={addMember} className="btn btn-outline-primary mt-2">
@@ -303,6 +321,18 @@ export default function EditIdolPage() {
                             onChange={(e) => handleSongChange(i, 'spotifyUrl', e.target.value)}
                             className="input"
                         />
+                        <button
+                            type="button"
+                            onClick={() => {
+                                const updated = [...songs];
+                                updated.splice(i, 1);
+                                setSongs(updated);
+                            }}
+                            className="btn btn-sm btn-outline-danger mt-2"
+                        >
+                            Hapus Lagu Ini
+                        </button>
+
                     </div>
                 ))}
                 <button type="button" onClick={addSong} className="btn btn-outline-primary mt-2">

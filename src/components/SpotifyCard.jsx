@@ -7,17 +7,17 @@ export default function SpotifyCard({ song }) {
     try {
       // Mengambil track ID dari berbagai format URL Spotify
       let trackId = '';
-      
+
       if (url.includes('open.spotify.com/track/')) {
         trackId = url.split('track/')[1].split('?')[0];
       } else if (url.includes('spotify:track:')) {
         trackId = url.split('spotify:track:')[1];
       }
-      
+
       if (trackId) {
         return `https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0`;
       }
-      
+
       return null;
     } catch (error) {
       console.error('Error parsing Spotify URL:', error);
@@ -34,15 +34,15 @@ export default function SpotifyCard({ song }) {
           <Spotify className="text-success" />
           {song.title}
         </Card.Title>
-        
+
         {song.artist && (
-          <Card.Subtitle className="mb-3 text-muted">
+          <Card.Subtitle className="mb-2 text-muted">
             {song.artist}
           </Card.Subtitle>
         )}
 
         {embedUrl ? (
-          <div className="ratio ratio-16x9 mt-auto mb-3">
+          <div className="spotify-iframe-wrapper">
             <iframe
               src={embedUrl}
               width="100%"
@@ -52,20 +52,16 @@ export default function SpotifyCard({ song }) {
               allow="encrypted-media"
               loading="lazy"
               title={`Spotify player for ${song.title}`}
-              style={{
-                borderRadius: '12px'
-              }}
             />
           </div>
         ) : (
-          // Fallback jika embed tidak bisa dimuat
-          <div className="spotify-fallback text-center py-4 mt-auto mb-3">
-            <div className="bg-light rounded p-4">
+          <div className="spotify-fallback text-center">
+            <div className="bg-light rounded p-4 w-100">
               <PlayFill size={48} className="text-success mb-3" />
               <p className="mb-3">Preview tidak tersedia</p>
-              <Button 
-                href={song.spotifyUrl} 
-                target="_blank" 
+              <Button
+                href={song.spotifyUrl}
+                target="_blank"
                 rel="noopener noreferrer"
                 variant="success"
                 size="sm"
@@ -77,11 +73,10 @@ export default function SpotifyCard({ song }) {
           </div>
         )}
 
-        {/* Tombol buka di Spotify selalu ada */}
-        <div className="text-center">
-          <Button 
-            href={song.spotifyUrl} 
-            target="_blank" 
+        <div className="text-center mt-auto">
+          <Button
+            href={song.spotifyUrl}
+            target="_blank"
             rel="noopener noreferrer"
             variant="outline-success"
             size="sm"
@@ -92,5 +87,6 @@ export default function SpotifyCard({ song }) {
         </div>
       </Card.Body>
     </Card>
+
   );
 }

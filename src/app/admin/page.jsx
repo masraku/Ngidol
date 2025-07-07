@@ -4,6 +4,7 @@ import { Users, Calendar, Heart, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function DashboardPage() {
+  const [users, setUsers] = useState(0);
   const [idols, setIdols] = useState([]);
   const [events, setEvents] = useState([]);
   const [notifications, setNotifications] = useState([]);
@@ -11,19 +12,22 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [idolsRes, eventsRes, notifsRes] = await Promise.all([
+        const [idolsRes, eventsRes, notifsRes, usersRes] = await Promise.all([
           fetch('/api/idol'),
           fetch('/api/event'),
-          fetch('/api/notification')
+          fetch('/api/notification'),
+          fetch('/api/user')
         ]);
 
         const idolsData = await idolsRes.json();
         const eventsData = await eventsRes.json();
+        const usersData = await usersRes.json();
         const notifsData = await notifsRes.json();
 
         setIdols(idolsData);
         setEvents(eventsData.data || []);
         setNotifications(notifsData.data || []);
+        setUsers(usersData.total || 0);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -70,12 +74,13 @@ export default function DashboardPage() {
         <div className="dashboard-card">
           <div className="dashboard-card-content">
             <div>
-              <p className="dashboard-label">Total Followers</p>
-              <p className="dashboard-value">2.4M</p>
+              <p className="dashboard-label">Total User Aktif</p>
+              <p className="dashboard-value">{users}</p>
             </div>
             <Heart className="dashboard-icon red" />
           </div>
         </div>
+
 
         <div className="dashboard-card">
           <div className="dashboard-card-content">
