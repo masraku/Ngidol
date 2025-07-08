@@ -18,17 +18,17 @@ export default function PreferencesPage() {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
-  
+
   // Data states
   const [categories, setCategories] = useState([]);
   const [idols, setIdols] = useState([]);
   const [members, setMembers] = useState([]);
-  
+
   // Selected preferences
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedIdols, setSelectedIdols] = useState([]);
   const [selectedMembers, setSelectedMembers] = useState([]);
-  
+
   // Filter states
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('');
   const [searchMember, setSearchMember] = useState('');
@@ -44,17 +44,17 @@ export default function PreferencesPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch categories
       const categoriesRes = await fetch('/api/category');
       const categoriesData = await categoriesRes.json();
       setCategories(categoriesData.data || []);
-      
+
       // Fetch idols
       const idolsRes = await fetch('/api/idol');
       const idolsData = await idolsRes.json();
       setIdols(idolsData || []);
-      
+
       // Extract members from idols
       const allMembers = [];
       idolsData.forEach(idol => {
@@ -68,17 +68,17 @@ export default function PreferencesPage() {
         }
       });
       setMembers(allMembers);
-      
+
       // Fetch current user preferences
       const userRes = await fetch('/api/user/profile');
       const userData = await userRes.json();
-      
+
       if (userData.user) {
         setSelectedCategories(userData.user.favoriteCategories?.map(c => c.id) || []);
         setSelectedIdols(userData.user.favoriteIdols?.map(i => i.id) || []);
         setSelectedMembers(userData.user.favoriteMembers?.map(m => m.id) || []);
       }
-      
+
     } catch (error) {
       console.error('Error fetching data:', error);
       showToastMessage('Gagal memuat data', 'error');
@@ -88,24 +88,24 @@ export default function PreferencesPage() {
   };
 
   const handleCategoryToggle = (categoryId) => {
-    setSelectedCategories(prev => 
-      prev.includes(categoryId) 
+    setSelectedCategories(prev =>
+      prev.includes(categoryId)
         ? prev.filter(id => id !== categoryId)
         : [...prev, categoryId]
     );
   };
 
   const handleIdolToggle = (idolId) => {
-    setSelectedIdols(prev => 
-      prev.includes(idolId) 
+    setSelectedIdols(prev =>
+      prev.includes(idolId)
         ? prev.filter(id => id !== idolId)
         : [...prev, idolId]
     );
   };
 
   const handleMemberToggle = (memberId) => {
-    setSelectedMembers(prev => 
-      prev.includes(memberId) 
+    setSelectedMembers(prev =>
+      prev.includes(memberId)
         ? prev.filter(id => id !== memberId)
         : [...prev, memberId]
     );
@@ -119,29 +119,28 @@ export default function PreferencesPage() {
 
     try {
       setSaving(true);
-      
-      const response = await fetch('/api/user/preferences', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          categoryIds: selectedCategories,
-          idolIds: selectedIdols,
-          memberIds: selectedMembers
-        }),
-        credentials: 'include',
-      });
 
-      if (!response.ok) {
-        throw new Error('Gagal menyimpan preferensi');
-      }
+      // Simpan kategori
+      const catRes = await fetch('/api/user/preferences/categories', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categoryIds: selectedCategories }),
+      });
+      if (!catRes.ok) throw new Error('Gagal menyimpan kategori');
+
+      // Simpan idol & member favorit
+      const favRes = await fetch('/api/user/preferences/favorites', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          idolIds: selectedIdols,
+          memberIds: selectedMembers,
+        }),
+      });
+      if (!favRes.ok) throw new Error('Gagal menyimpan favorit');
 
       showToastMessage('Preferensi berhasil disimpan!', 'success');
-      setTimeout(() => {
-        router.push('/user/mypage');
-      }, 1500);
-      
+      setTimeout(() => router.push('/user/mypage'), 1500);
     } catch (error) {
       console.error('Error saving preferences:', error);
       showToastMessage('Gagal menyimpan preferensi', 'error');
@@ -150,6 +149,7 @@ export default function PreferencesPage() {
     }
   };
 
+
   const showToastMessage = (msg, type = 'success') => {
     setToastMessage(msg);
     setToastType(type);
@@ -157,12 +157,12 @@ export default function PreferencesPage() {
   };
 
   const filteredMembers = members.filter(member => {
-    const matchesCategory = !selectedCategoryFilter || 
+    const matchesCategory = !selectedCategoryFilter ||
       member.idol?.category?.id === parseInt(selectedCategoryFilter);
-    const matchesSearch = !searchMember || 
+    const matchesSearch = !searchMember ||
       member.name.toLowerCase().includes(searchMember.toLowerCase()) ||
       member.idol?.name.toLowerCase().includes(searchMember.toLowerCase());
-    
+
     return matchesCategory && matchesSearch;
   });
 
@@ -279,11 +279,10 @@ export default function PreferencesPage() {
                   {categories.map(category => (
                     <Col md={4} key={category.id} className="mb-2">
                       <Card
-                        className={`cursor-pointer border-2 ${
-                          selectedCategories.includes(category.id) 
-                            ? 'border-primary bg-primary bg-opacity-10' 
+                        className={`cursor-pointer border-2 ${selectedCategories.includes(category.id)
+                            ? 'border-primary bg-primary bg-opacity-10'
                             : 'border-light'
-                        }`}
+                          }`}
                         onClick={() => handleCategoryToggle(category.id)}
                         style={{ cursor: 'pointer' }}
                       >
@@ -316,11 +315,10 @@ export default function PreferencesPage() {
                   {idols.map(idol => (
                     <Col md={4} key={idol.id} className="mb-3">
                       <Card
-                        className={`cursor-pointer border-2 ${
-                          selectedIdols.includes(idol.id) 
-                            ? 'border-success bg-success bg-opacity-10' 
+                        className={`cursor-pointer border-2 ${selectedIdols.includes(idol.id)
+                            ? 'border-success bg-success bg-opacity-10'
                             : 'border-light'
-                        }`}
+                          }`}
                         onClick={() => handleIdolToggle(idol.id)}
                         style={{ cursor: 'pointer' }}
                       >
@@ -358,7 +356,7 @@ export default function PreferencesPage() {
                 <Alert variant="info" className="small">
                   <strong>Opsional:</strong> Pilih member individual yang kamu sukai dari berbagai idol group.
                 </Alert>
-                
+
                 {/* Filters */}
                 <Row className="mb-3">
                   <Col md={6}>
@@ -386,11 +384,10 @@ export default function PreferencesPage() {
                   {filteredMembers.map(member => (
                     <Col md={4} key={member.id} className="mb-3">
                       <Card
-                        className={`cursor-pointer border-2 ${
-                          selectedMembers.includes(member.id) 
-                            ? 'border-warning bg-warning bg-opacity-10' 
+                        className={`cursor-pointer border-2 ${selectedMembers.includes(member.id)
+                            ? 'border-warning bg-warning bg-opacity-10'
                             : 'border-light'
-                        }`}
+                          }`}
                         onClick={() => handleMemberToggle(member.id)}
                         style={{ cursor: 'pointer' }}
                       >
@@ -415,7 +412,7 @@ export default function PreferencesPage() {
                     </Col>
                   ))}
                 </Row>
-                
+
                 {filteredMembers.length === 0 && (
                   <Alert variant="secondary" className="text-center">
                     Tidak ada member yang sesuai dengan filter
