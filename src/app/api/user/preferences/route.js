@@ -5,17 +5,14 @@ import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
-// ✅ Async JWT verification
 async function getUserFromToken() {
   try {
     const cookieStore = cookies();
     const token = cookieStore.get('token');
-
     if (!token) return null;
 
     const decoded = jwt.verify(token.value, process.env.JWT_SECRET);
     if (decoded.role !== 'user') return null;
-
     return decoded;
   } catch (err) {
     console.error('[SESSION] JWT Error:', err.message);
@@ -24,9 +21,7 @@ async function getUserFromToken() {
 }
 
 export async function GET() {
-  console.log('[GET] Memuat preferensi user');
-
-  const userToken = await getUserFromToken(); // ✅ gunakan await
+  const userToken = await getUserFromToken();
   if (!userToken) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -36,14 +31,8 @@ export async function GET() {
       where: { id: userToken.id },
       include: {
         favoriteCategories: true,
-        favoriteIdols: {
-          include: { category: true },
-        },
-        favoriteMembers: {
-          include: {
-            idol: { include: { category: true } },
-          },
-        },
+        favoriteIdols: { include: { category: true } },
+        favoriteMembers: { include: { idol: { include: { category: true } } } },
       },
     });
 
@@ -65,120 +54,63 @@ export async function GET() {
     });
   } catch (error) {
     console.error('[GET] Error:', error);
-    return NextResponse.json(
-      { error: 'Terjadi kesalahan saat memuat preferensi' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Terjadi kesalahan saat memuat preferensi' }, { status: 500 });
   }
 }
 
 export async function PUT(req) {
-  console.log('[PUT] Memproses preferensi user');
-
-  const userToken = await getUserFromToken(); // ✅ gunakan await
+  const userToken = await getUserFromToken();
   if (!userToken) {
-    console.warn('[PUT] Session null. Kemungkinan user belum login atau cookie hilang.');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
-    const body = await req.json();
     const {
       categoryIds,
       idolIds,
       memberIds,
       emailNotifications,
       eventReminders,
-    } = body;
+    } = await req.json();
 
-    console.log('[PUT] Body:', body);
-
-    const user = await prisma.user.findUnique({
-      where: { id: userToken.id },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    // Validasi kategori
     if (!categoryIds || categoryIds.length === 0) {
-      return NextResponse.json(
-        { error: 'Minimal satu kategori harus dipilih' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Minimal satu kategori harus dipilih' }, { status: 400 });
     }
 
-    const validCategories = await prisma.category.findMany({
-      where: { id: { in: categoryIds } },
-    });
+    // ✅ Gunakan prisma.count untuk validasi cepat
+    const [catCount, idolCount, memberCount] = await Promise.all([
+      prisma.category.count({ where: { id: { in: categoryIds } } }),
+      idolIds?.length ? prisma.idol.count({ where: { id: { in: idolIds } } }) : Promise.resolve(0),
+      memberIds?.length ? prisma.member.count({ where: { id: { in: memberIds } } }) : Promise.resolve(0),
+    ]);
 
-    if (validCategories.length !== categoryIds.length) {
-      return NextResponse.json(
-        { error: 'Beberapa kategori tidak valid' },
-        { status: 400 }
-      );
+    if (catCount !== categoryIds.length) {
+      return NextResponse.json({ error: 'Beberapa kategori tidak valid' }, { status: 400 });
     }
-
-    if (idolIds?.length) {
-      const validIdols = await prisma.idol.findMany({
-        where: { id: { in: idolIds } },
-      });
-
-      if (validIdols.length !== idolIds.length) {
-        return NextResponse.json(
-          { error: 'Beberapa idol tidak valid' },
-          { status: 400 }
-        );
-      }
+    if (idolIds?.length && idolCount !== idolIds.length) {
+      return NextResponse.json({ error: 'Beberapa idol tidak valid' }, { status: 400 });
     }
-
-    if (memberIds?.length) {
-      const validMembers = await prisma.member.findMany({
-        where: { id: { in: memberIds } },
-      });
-
-      if (validMembers.length !== memberIds.length) {
-        return NextResponse.json(
-          { error: 'Beberapa member tidak valid' },
-          { status: 400 }
-        );
-      }
+    if (memberIds?.length && memberCount !== memberIds.length) {
+      return NextResponse.json({ error: 'Beberapa member tidak valid' }, { status: 400 });
     }
 
     const updateData = {
       favoriteCategories: { set: categoryIds.map((id) => ({ id })) },
+      ...(idolIds !== undefined && { favoriteIdols: { set: idolIds.map((id) => ({ id })) } }),
+      ...(memberIds !== undefined && { favoriteMembers: { set: memberIds.map((id) => ({ id })) } }),
+      ...(emailNotifications !== undefined && { emailNotifications }),
+      ...(eventReminders !== undefined && { eventReminders }),
     };
 
-    if (idolIds !== undefined) {
-      updateData.favoriteIdols = { set: idolIds.map((id) => ({ id })) };
-    }
-
-    if (memberIds !== undefined) {
-      updateData.favoriteMembers = { set: memberIds.map((id) => ({ id })) };
-    }
-
-    if (emailNotifications !== undefined) {
-      updateData.emailNotifications = emailNotifications;
-    }
-
-    if (eventReminders !== undefined) {
-      updateData.eventReminders = eventReminders;
-    }
-
     const updatedUser = await prisma.user.update({
-      where: { id: user.id },
+      where: { id: userToken.id },
       data: updateData,
       include: {
         favoriteCategories: true,
         favoriteIdols: true,
-        favoriteMembers: {
-          include: { idol: true },
-        },
+        favoriteMembers: { include: { idol: true } },
       },
     });
-
-    console.log('[PUT] Preferensi berhasil diperbarui untuk', updatedUser.email);
 
     return NextResponse.json({
       message: 'Preferensi berhasil diperbarui',
