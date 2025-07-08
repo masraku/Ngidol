@@ -1,48 +1,55 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Form, Button, Card, Container, Alert } from "react-bootstrap";
 import { useAuth } from '@/app/user/context/AuthContext'; 
 
 export default function UniversalLogin() {
   const router = useRouter();
-  const { fetchUser } = useAuth(); // Ambil fetchUser dari context
+  const { user, fetchUser } = useAuth(); // Ambil user & fetchUser
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // 🔐 Jika sudah login, redirect otomatis
+  useEffect(() => {
+    if (user) {
+      if (user.role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/user/mypage');
+      }
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg("");
+    setLoading(true);
 
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
-        credentials: 'include', // penting untuk cookie JWT
+        credentials: 'include',
       });
 
       const data = await res.json();
 
       if (!res.ok) {
         setErrorMsg(data.message || "Gagal login");
+        setLoading(false);
         return;
       }
 
-      await fetchUser(); // Segera update context agar user langsung tersedia
-
-      // Login berhasil → arahkan sesuai role
-      if (data.role === 'admin') {
-        router.push('/admin');
-      } else {
-        router.push('/user/mypage');
-      }
-
+      await fetchUser(); // update context → akan trigger redirect dari useEffect
     } catch (error) {
       console.error("Login error", error);
       setErrorMsg("Terjadi kesalahan saat login");
+      setLoading(false);
     }
   };
 
@@ -64,6 +71,7 @@ export default function UniversalLogin() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
               />
             </Form.Group>
 
@@ -74,17 +82,18 @@ export default function UniversalLogin() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
               />
             </Form.Group>
 
-            <Button type="submit" variant="primary" className="w-100">
-              Login
+            <Button type="submit" variant="primary" className="w-100" disabled={loading}>
+              {loading ? 'Logging in...' : 'Login'}
             </Button>
           </Form>
 
           <div className="text-center mt-3">
             <span>Belum punya akun?</span>
-            <Button variant="link" onClick={goToRegister} className="p-0 ms-1">
+            <Button variant="link" onClick={goToRegister} className="p-0 ms-1" disabled={loading}>
               Daftar Sekarang
             </Button>
           </div>

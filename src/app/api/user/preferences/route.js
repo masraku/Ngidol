@@ -3,10 +3,10 @@ import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 import prisma from '@/lib/prisma';
 
-// Hindari Edge Runtime karena kita pakai cookies + prisma
 export const dynamic = 'force-dynamic';
 
-function getUserFromToken() {
+// ✅ Async JWT verification
+async function getUserFromToken() {
   try {
     const cookieStore = cookies();
     const token = cookieStore.get('token');
@@ -14,7 +14,7 @@ function getUserFromToken() {
     if (!token) return null;
 
     const decoded = jwt.verify(token.value, process.env.JWT_SECRET);
-    if (decoded.role !== 'user') return null; // hanya user, bukan admin
+    if (decoded.role !== 'user') return null;
 
     return decoded;
   } catch (err) {
@@ -26,7 +26,7 @@ function getUserFromToken() {
 export async function GET() {
   console.log('[GET] Memuat preferensi user');
 
-  const userToken = getUserFromToken();
+  const userToken = await getUserFromToken(); // ✅ gunakan await
   if (!userToken) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -75,7 +75,7 @@ export async function GET() {
 export async function PUT(req) {
   console.log('[PUT] Memproses preferensi user');
 
-  const userToken = getUserFromToken();
+  const userToken = await getUserFromToken(); // ✅ gunakan await
   if (!userToken) {
     console.warn('[PUT] Session null. Kemungkinan user belum login atau cookie hilang.');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -101,7 +101,7 @@ export async function PUT(req) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Validasi wajib
+    // Validasi kategori
     if (!categoryIds || categoryIds.length === 0) {
       return NextResponse.json(
         { error: 'Minimal satu kategori harus dipilih' },

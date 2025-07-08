@@ -4,6 +4,10 @@ import { supabaseServerClient as supabase } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
 import { createNotification } from '@/lib/notification';
 
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
+
+// --- GET: Ambil detail idol berdasarkan slug
 export async function GET(req, { params }) {
   const { slug } = params;
 
@@ -23,22 +27,23 @@ export async function GET(req, { params }) {
 
     return NextResponse.json(idol);
   } catch (error) {
-    console.error(error);
+    console.error('❌ GET error:', error);
     return NextResponse.json({ error: 'Gagal mengambil data idol' }, { status: 500 });
   }
 }
 
+// --- PATCH: Perbarui idol
 export async function PATCH(req, { params }) {
   const { slug } = params;
-  console.log('📥 PATCH /api/idol/[slug] called with slug:', slug);
+  console.log('📥 PATCH /api/idol/[slug] called');
 
   try {
     const formData = await req.formData();
 
-    // --- Get all fields ---
+    // Ambil input utama
     const name = formData.get('name')?.toString();
-    const description = formData.get('description')?.toString();
     const newSlug = formData.get('slug')?.toString();
+    const description = formData.get('description')?.toString();
     const imageFile = formData.get('image');
     const categoryIdRaw = formData.get('categoryId')?.toString();
 
@@ -46,36 +51,23 @@ export async function PATCH(req, { params }) {
       return NextResponse.json({ error: 'Nama dan slug wajib diisi' }, { status: 400 });
     }
 
-    // --- Sosmed ---
-    let sosmeds = [];
-    try {
-      sosmeds = JSON.parse(formData.get('sosmeds') || '[]');
-    } catch (e) {
-      return NextResponse.json({ error: 'Format sosmed tidak valid' }, { status: 400 });
-    }
-
-    // --- Members ---
-    let members = [];
-    try {
-      members = JSON.parse(formData.get('members') || '[]');
-    } catch (e) {
-      return NextResponse.json({ error: 'Format member tidak valid' }, { status: 400 });
-    }
-
-    // --- Songs ---
-    let songs = [];
-    try {
-      songs = JSON.parse(formData.get('songs') || '[]');
-    } catch (e) {
-      return NextResponse.json({ error: 'Format lagu tidak valid' }, { status: 400 });
-    }
-
+    // Parse kategori
     const categoryId = categoryIdRaw ? parseInt(categoryIdRaw, 10) : null;
     if (categoryIdRaw && isNaN(categoryId)) {
       return NextResponse.json({ error: 'Kategori tidak valid' }, { status: 400 });
     }
 
-    // --- Upload Idol Image if Exists ---
+    // Parse sosmed, members, dan songs
+    let sosmeds = [], members = [], songs = [];
+    try {
+      sosmeds = JSON.parse(formData.get('sosmeds') || '[]');
+      members = JSON.parse(formData.get('members') || '[]');
+      songs = JSON.parse(formData.get('songs') || '[]');
+    } catch (e) {
+      return NextResponse.json({ error: 'Format data tidak valid' }, { status: 400 });
+    }
+
+    // Upload idol image (jika ada)
     let imageUrl = null;
     if (imageFile && typeof imageFile.name === 'string') {
       const ext = imageFile.name.split('.').pop();
@@ -85,20 +77,19 @@ export async function PATCH(req, { params }) {
       const { error } = await supabase.storage
         .from('idol')
         .upload(fileName, buffer, {
-          cacheControl: '3600',
-          upsert: false,
           contentType: imageFile.type,
+          upsert: false,
         });
 
       if (error) {
-        console.error('❌ Gagal upload idol image:', error.message || error);
-        return NextResponse.json({ error: 'Gagal upload gambar idol' }, { status: 500 });
+        console.error('❌ Gagal upload gambar idol:', error.message);
+        return NextResponse.json({ error: 'Upload gambar idol gagal' }, { status: 500 });
       }
 
       imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/idol/${fileName}`;
     }
 
-    // --- Update Idol ---
+    // Update data idol
     const updatedIdol = await prisma.idol.update({
       where: { slug },
       data: {
@@ -111,13 +102,13 @@ export async function PATCH(req, { params }) {
       },
     });
 
-    // --- Delete old members and songs (in parallel) ---
+    // Hapus semua member & song lama (paralel)
     await Promise.all([
       prisma.member.deleteMany({ where: { idolId: updatedIdol.id } }),
       prisma.song.deleteMany({ where: { idolId: updatedIdol.id } }),
     ]);
 
-    // --- Upload Member Images in Parallel ---
+    // Upload gambar member (paralel)
     const uploadedMemberImages = await Promise.all(
       members.map(async (m, i) => {
         const memberImageFile = formData.get(`memberImage-${i}`);
@@ -129,24 +120,23 @@ export async function PATCH(req, { params }) {
           const { error } = await supabase.storage
             .from('idol')
             .upload(fileName, buffer, {
-              cacheControl: '3600',
-              upsert: false,
               contentType: memberImageFile.type,
+              upsert: false,
             });
 
           if (error) {
-            console.error(`❌ Gagal upload gambar member ${m.name}:`, error.message || error);
-            throw new Error(`Gagal upload gambar member: ${m.name}`);
+            console.error(`❌ Gagal upload member ${m.name}:`, error.message);
+            throw new Error(`Upload member gagal: ${m.name}`);
           }
 
           return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/idol/${fileName}`;
         }
 
-        return m.image || null;
+        return m.image || '';
       })
     );
 
-    // --- Create Member Entries ---
+    // Simpan members baru
     await prisma.member.createMany({
       data: members.map((m, i) => ({
         idolId: updatedIdol.id,
@@ -158,7 +148,7 @@ export async function PATCH(req, { params }) {
       })),
     });
 
-    // --- Create Songs ---
+    // Simpan lagu baru
     if (songs.length > 0) {
       await prisma.song.createMany({
         data: songs.map((s) => ({
@@ -169,7 +159,7 @@ export async function PATCH(req, { params }) {
       });
     }
 
-    // --- Create Notification ---
+    // Buat notifikasi
     await createNotification({
       message: `Idol "${updatedIdol.name}" telah diperbarui`,
       type: 'Idol',
@@ -177,9 +167,8 @@ export async function PATCH(req, { params }) {
     });
 
     return NextResponse.json({ message: 'Idol berhasil diperbarui' });
-
   } catch (error) {
-    console.error('❌ PATCH /api/idol/[slug] error:', error);
+    console.error('❌ PATCH error:', error);
     return NextResponse.json({ error: 'Terjadi kesalahan saat memperbarui idol' }, { status: 500 });
   }
 }
