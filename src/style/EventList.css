@@ -1,0 +1,50 @@
+/* EventList.css */
+
+/* General styles for the container */
+.container-fluid {
+  padding: 2rem 0; /* Add padding to the top and bottom */
+}
+
+/* Centering the title and subtitle */
+.text-center {
+  text-align: center;
+}
+
+/* Styles for the search card */
+.card {
+  border: none; /* Remove default border */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Styles for the input group */
+.input-group {
+  margin-bottom: 1rem; /* Space below the input group */
+}
+
+/* Button styles for category selection */
+.category-bubble {
+  transition: background-color 0.3s ease; /* Smooth transition for hover */
+}
+
+.category-bubble.active {
+  background-color: #8B0000; /* Active category color */
+  color: white; /* Text color for active category */
+}
+
+/* Styles for the event cards */
+.event-showcase-card {
+  margin: 0 auto; /* Center the card within its column */
+}
+
+/* Centering the spinner */
+.spinner-border {
+  margin: auto; /* Center the spinner */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container-fluid {
+    padding: 1rem; /* Reduce padding on smaller screens */
+  }
+}

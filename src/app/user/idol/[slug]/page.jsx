@@ -81,11 +81,12 @@ export default function IdolDetailPage() {
                 <>
                     <hr />
                     <h4 className="fw-semibold text-maroon mt-4 mb-3">Lagu di Spotify</h4>
-                    <div className="members-grid">
+                    <div className="spotify-grid">
                         {idol.songs.map((song) => (
                             <SpotifyCard key={song.id} song={song} />
                         ))}
                     </div>
+
                 </>
             )}
         </Container>

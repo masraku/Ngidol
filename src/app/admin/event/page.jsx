@@ -49,7 +49,7 @@ export default function EventListPage() {
     <Container className="py-4 bg-gradient-custom">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h3 className="fw-bold text-dark">Daftar Event</h3>
-        <Link href="/event/add" passHref legacyBehavior>
+        <Link href="/admin/event/add" passHref legacyBehavior>
           <Button className="d-flex align-items-center gap-2 btn-custom">
             <Plus size={18} />
             Tambah Event

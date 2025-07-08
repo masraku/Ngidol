@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Konfigurasi image Supabase
   images: {
     remotePatterns: [
       {
@@ -10,14 +11,22 @@ const nextConfig = {
     ],
   },
 
+  // Redirect halaman root ke /user
   async redirects() {
     return [
       {
         source: '/',
         destination: '/user',
-        permanent: true, // ubah ke false kalau ingin sementara
+        permanent: true,
       },
     ];
+  },
+
+  // ✅ Tambahkan batas maksimal ukuran body upload untuk API route
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb', // Atur sesuai kebutuhan, misalnya '20mb' kalau banyak gambar
+    },
   },
 };
 

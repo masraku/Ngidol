@@ -1,0 +1,79 @@
+/* AboutClient.css */
+.about-page {
+  background: linear-gradient(to bottom right, #fff5f5, #ffeef2, #ffe5e5);
+  min-height: 100vh;
+}
+
+.about-card {
+  border-top: 5px solid #800000;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.icon-circle {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(to right, #800000, #a00000);
+  color: white;
+  font-weight: bold;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-right: 1rem;
+}
+
+.section-title {
+  color: #800000;
+  font-size: 1.75rem;
+  font-weight: bold;
+}
+
+.gallery-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  aspect-ratio: 3 / 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gallery-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gallery-caption {
+  position: absolute;
+  bottom: 0;
+  background: rgba(139, 0, 0, 0.8);
+  color: white;
+  width: 100%;
+  padding: 8px 12px;
+  font-weight: 500;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+
+.contact-section {
+  background: linear-gradient(to right, #800000, #a00000);
+  padding: 2rem;
+  border-radius: 16px;
+}
+
+.contact-card {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 12px;
+}

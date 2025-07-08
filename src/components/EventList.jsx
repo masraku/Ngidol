@@ -14,6 +14,7 @@ import {
 import { Search } from 'react-bootstrap-icons';
 import EventCard from './EventCardUser';
 import axios from 'axios';
+import '@/style/EventList.css'; 
 
 export default function EventList() {
   const [events, setEvents] = useState([]);
@@ -134,9 +135,16 @@ export default function EventList() {
             </div>
           ) : filteredEvents.length > 0 ? (
             <>
-              <Row>
+              <Row className="justify-content-center">
                 {visibleEvents.map((event) => (
-                  <Col key={event.slug} xs={12} sm={6} md={4} className="mb-4">
+                  <Col
+                    key={event.id}
+                    xxl={3} // 3 cards per row on extra large screens
+                    xl={4}  // 4 cards per row on large screens
+                    md={6}  // 2 cards per row on medium screens
+                    sm={12} // 1 card per row on small screens
+                    className="d-flex justify-content-center mb-4"
+                  >
                     <EventCard event={event} />
                   </Col>
                 ))}
