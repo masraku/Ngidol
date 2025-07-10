@@ -256,7 +256,7 @@ export default function MyPageClient() {
                                                                 <Button
                                                                     variant="outline-primary"
                                                                     size="sm"
-                                                                    href={`/events/${event.slug}`}>
+                                                                    href={`/user/event/${event.slug}`}>
                                                                     <Eye size={14} className="me-1" />
                                                                     Detail
                                                                 </Button>

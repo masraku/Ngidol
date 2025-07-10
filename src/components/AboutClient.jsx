@@ -101,7 +101,7 @@ export default function AboutClient() {
         {/* Contact Section */}
         <div className="contact-section text-white p-4 rounded">
           <div className="section-header">
-            <div className="icon-circle bg-white text-dark">📞</div>
+            <div className="icon-circle bg-dark text-white">📞</div>
             <h2 className="section-title">Hubungi Kami</h2>
           </div>
           <p>Jika Anda memiliki pertanyaan atau ingin bekerja sama dengan kami, silakan hubungi kami di:</p>

@@ -2,15 +2,34 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Card, Badge, Button, Image, OverlayTrigger, Tooltip, Container, Row, Col } from 'react-bootstrap';
-import { Calendar, Clock, GeoAlt, Bookmark, BookmarkCheck } from 'react-bootstrap-icons';
-import '@/style/Event.css'; // Update the import path
+import {
+  Card,
+  Button,
+  Image,
+  OverlayTrigger,
+  Tooltip,
+  Container,
+  Row,
+  Col,
+} from 'react-bootstrap';
+import {
+  Calendar,
+  Clock,
+  GeoAlt,
+  Bookmark,
+  BookmarkCheck,
+  InfoCircle,
+} from 'react-bootstrap-icons';
+import { usePathname } from 'next/navigation';
+import '@/style/Event.css';
 import { useAuth } from '@/app/user/context/AuthContext';
 
 export default function EventCard({ event }) {
   const { user } = useAuth();
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const pathname = usePathname(); // Detect route change
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -19,37 +38,49 @@ export default function EventCard({ event }) {
   };
 
   useEffect(() => {
+    if (!user || !event?.id) return;
+
     const checkSavedStatus = async () => {
-      if (!user) return;
+      try {
+        setChecking(true);
+        const res = await fetch(`/api/user/events/${event.id}/saved`, {
+          credentials: 'include',
+          cache: 'no-store',
+        });
 
-      const res = await fetch(`/api/user/events/${event.id}/saved`, {
-        credentials: 'include'
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setSaved(data.saved); // misal: { saved: true }
+        if (res.ok) {
+          const data = await res.json();
+          setSaved(data.saved);
+        } else {
+        }
+      } catch (err) {
+      } finally {
+        setChecking(false);
       }
     };
 
     checkSavedStatus();
-  }, [user]);
+  }, [user?.id, event?.id, pathname]);
 
-  const handleSaveEvent = async () => {
+
+
+  const handleToggleSave = async () => {
     if (!user || saving) return;
 
     try {
       setSaving(true);
-      const response = await fetch(`/api/user/events/${event.id}/save`, {
-        method: 'POST',
+
+      const method = saved ? 'DELETE' : 'POST';
+      const res = await fetch(`/api/user/events/${event.id}/save`, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
       });
 
-      if (!response.ok) throw new Error('Gagal menyimpan event');
-      setSaved(true);
+      if (!res.ok) throw new Error('Gagal toggle simpan event');
+      setSaved(!saved);
     } catch (err) {
-      console.error('Save event failed:', err);
+      console.error('Toggle simpan event gagal:', err);
     } finally {
       setSaving(false);
     }
@@ -60,14 +91,13 @@ export default function EventCard({ event }) {
       <Row>
         <Col>
           <Card className="event-showcase-card">
-            {/* Header */}
             <div className="event-header-bar" />
 
             {/* Gambar Event */}
             <div className="event-image-container">
               {event.photos?.[0] ? (
                 <Card.Img
-                  src={event.photos[0]} // Ensure to access the first photo
+                  src={event.photos[0]}
                   alt={event.name}
                   className="event-showcase-image"
                 />
@@ -79,15 +109,12 @@ export default function EventCard({ event }) {
               )}
 
               {event.htm && (
-                <div className="event-price-badge">
-                  {event.htm}
-                </div>
+                <div className="event-price-badge">{event.htm}</div>
               )}
 
               <div className="event-gradient-overlay" />
             </div>
 
-            {/* Body */}
             <Card.Body className="event-showcase-body">
               <div className="event-category-slug">
                 {event.category?.name || 'Tanpa Kategori'}
@@ -97,7 +124,6 @@ export default function EventCard({ event }) {
                 {event.name}
               </Card.Title>
 
-              {/* Info Date, Time, Location */}
               <div className="event-details-info">
                 <div className="event-detail-item">
                   <Calendar className="event-detail-icon" />
@@ -125,9 +151,7 @@ export default function EventCard({ event }) {
                           alt={guest.name}
                           className="event-guest-avatar"
                         />
-                        <div className="event-guest-name">
-                          {guest.name}
-                        </div>
+                        <div className="event-guest-name">{guest.name}</div>
                       </div>
                     ))}
                     {event.guests.length > 4 && (
@@ -139,7 +163,7 @@ export default function EventCard({ event }) {
                 </div>
               )}
 
-              {/* Tombol Aksi */}
+              {/* Aksi */}
               <div className="event-showcase-actions d-flex justify-content-between align-items-center">
                 <Button
                   as={Link}
@@ -149,27 +173,46 @@ export default function EventCard({ event }) {
                   Lihat Event
                 </Button>
 
-                {/* Tombol Simpan */}
                 {user?.role === 'user' && (
-                  <OverlayTrigger
-                    overlay={
-                      <Tooltip>{saved ? 'Sudah Disimpan' : 'Simpan Event'}</Tooltip>
-                    }
-                  >
-                    <Button
-                      variant={saved ? 'success' : 'outline-primary'}
-                      size="sm"
-                      onClick={handleSaveEvent}
-                      disabled={saving || saved}
+                  <div className="d-flex gap-2 align-items-center">
+                    <OverlayTrigger
+                      overlay={
+                        <Tooltip>
+                          {saved ? 'Hapus dari Favorit' : 'Simpan ke Favorit'}
+                        </Tooltip>
+                      }
                     >
-                      {saved ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
-                    </Button>
-                  </OverlayTrigger>
+                      <Button
+                        variant={saved ? 'success' : 'outline-primary'}
+                        size="sm"
+                        onClick={handleToggleSave}
+                        disabled={saving || checking}
+                      >
+                        {saved ? (
+                          <BookmarkCheck size={18} />
+                        ) : (
+                          <Bookmark size={18} />
+                        )}
+                      </Button>
+
+                    </OverlayTrigger>
+
+                    <OverlayTrigger
+                      overlay={
+                        <Tooltip>
+                          {saved ? 'Event ini disimpan' : 'Belum disimpan'}
+                        </Tooltip>
+                      }
+                    >
+                      <span className="text-muted">
+                        <InfoCircle size={16} />
+                      </span>
+                    </OverlayTrigger>
+                  </div>
                 )}
               </div>
             </Card.Body>
 
-            {/* Footer */}
             <div className="event-footer-bar" />
           </Card>
         </Col>
