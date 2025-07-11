@@ -12,7 +12,6 @@ export default function EventListPage() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 6;
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -21,7 +20,7 @@ export default function EventListPage() {
     const fetchEvents = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`/api/event?page=${page}&limit=${limit}`);
+        const res = await axios.get(`/api/event`);
         const data = res.data;
         setEvents(data.data || []);
         setTotalPages(data.pagination?.totalPages || 1);
@@ -114,31 +113,6 @@ export default function EventListPage() {
                 ))}
               </Row>
             </>
-          )}
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="d-flex justify-content-center mt-4">
-              <Pagination>
-                <Pagination.Prev
-                  onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                  disabled={page === 1}
-                />
-                {[...Array(totalPages)].map((_, i) => (
-                  <Pagination.Item
-                    key={i}
-                    active={page === i + 1}
-                    onClick={() => setPage(i + 1)}
-                  >
-                    {i + 1}
-                  </Pagination.Item>
-                ))}
-                <Pagination.Next
-                  onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-                  disabled={page === totalPages}
-                />
-              </Pagination>
-            </div>
           )}
         </>
       )}

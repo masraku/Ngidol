@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
 import { Calendar, Clock, GeoAlt, Instagram, ArrowLeft, Star } from 'react-bootstrap-icons';
-import '@/style/EventDetail.css';
 
 export default function EventDetailClient({ event }) {
   const formatDate = (dateString) => {

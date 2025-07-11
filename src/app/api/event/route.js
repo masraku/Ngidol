@@ -91,16 +91,7 @@ export async function POST(req) {
 
 export async function GET(req) {
   try {
-    const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get('page')) || 1;
-    const limit = parseInt(searchParams.get('limit')) || 6;
-    const skip = (page - 1) * limit;
-
-    const total = await prisma.event.count();
-
     const events = await prisma.event.findMany({
-      skip,
-      take: limit,
       orderBy: { createdAt: 'desc' },
       include: {
         category: true,
@@ -114,14 +105,15 @@ export async function GET(req) {
       },
     });
 
+    const total = events.length; // Total event
     return NextResponse.json({
       message: 'Events retrieved successfully',
       data: events,
       pagination: {
         total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit)
+        page: 1, // Set page ke 1 karena kita tidak menggunakan pagination
+        limit: total, // Set limit ke total event
+        totalPages: 1 // Set totalPages ke 1
       }
     });
 
@@ -133,3 +125,4 @@ export async function GET(req) {
     }, { status: 500 });
   }
 }
+

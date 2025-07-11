@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { Card, Button, Badge } from 'react-bootstrap';
 import { MusicNote } from 'react-bootstrap-icons';
 import { useAuth } from '@/app/user/context/AuthContext';
-import '@/style/CardIdol.css'; // Import custom styles for the idol card
 
 export default function CardIdol({ idol }) {
   const { user } = useAuth();

@@ -14,7 +14,6 @@ import {
 import { Search } from 'react-bootstrap-icons';
 import EventCard from './EventCardUser';
 import axios from 'axios';
-import '@/style/EventList.css'; 
 
 export default function EventList() {
   const [events, setEvents] = useState([]);
@@ -100,14 +99,25 @@ export default function EventList() {
         <Col md={8}>
           <Card className="shadow-sm">
             <Card.Body>
-              <InputGroup className="mb-3">
-                <InputGroup.Text><Search /></InputGroup.Text>
+              <div className="position-relative mb-3">
                 <Form.Control
                   placeholder="Cari event atau guest star..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  className="ps-5" // padding start untuk beri ruang icon
                 />
-              </InputGroup>
+                <Search
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '15px',
+                    transform: 'translateY(-50%)',
+                    color: '#6c757d'
+                  }}
+                />
+              </div>
+
+
 
               <div className="d-flex flex-wrap gap-2 justify-content-center">
                 {categories.map((category) => (

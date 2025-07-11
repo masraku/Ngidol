@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
@@ -28,18 +28,20 @@ export default function NavbarComponent() {
     <Navbar
       variant='dark'
       expand="lg"
-      sticky='top'
+      fixed='top'
       className='shadow-sm'
       style={{ backgroundColor: '#431006' }}
     >
-      <Container>
-        <Navbar.Brand as={Link} href="/user">
+      <Container fluid className="px-2 px-lg-4">
+        <Navbar.Brand as={Link} href="/user" className="py-0">
           <Image
             src="/assets/muchit.svg"
             alt="Logo"
-            width={250}
-            height={125}
-            className="d-inline-block align-top me-2"
+            width={120}
+            height={60}
+            className="d-inline-block align-top"
+            priority
+            style={{ maxWidth: '120px', height: 'auto' }}
           />
         </Navbar.Brand>
 

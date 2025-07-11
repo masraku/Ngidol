@@ -21,7 +21,6 @@ import {
   InfoCircle,
 } from 'react-bootstrap-icons';
 import { usePathname } from 'next/navigation';
-import '@/style/Event.css';
 import { useAuth } from '@/app/user/context/AuthContext';
 
 export default function EventCard({ event }) {

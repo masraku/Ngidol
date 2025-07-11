@@ -1,5 +1,4 @@
 'use client';
-import '@/style/Dashboard.css';
 import { Users, Calendar, Heart, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
 

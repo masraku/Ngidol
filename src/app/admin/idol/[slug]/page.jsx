@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import axios from 'axios';
-import '@/style/IdolDetail.css'; // Custom CSS untuk style idol detail
 import { Container } from 'react-bootstrap';
 import MemberCard from '@/components/MemberCard';
 import SpotifyCard from '@/components/SpotifyCard';

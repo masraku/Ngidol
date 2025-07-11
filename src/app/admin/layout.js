@@ -1,5 +1,5 @@
-import '@/style/admin.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import '@/style/globals.css';
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header-Admin'
 import { Inter } from 'next/font/google'

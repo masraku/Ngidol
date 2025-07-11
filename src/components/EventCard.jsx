@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Card, Button, Image } from 'react-bootstrap';
 import { Calendar, Clock, GeoAlt } from 'react-bootstrap-icons';
-import '@/style/Event.css'; 
 import { useAuth } from '@/app/user/context/AuthContext';
 import Swal from 'sweetalert2';
 import axios from 'axios';

@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import '@/style/EventForm.css';
 
 const EventForm = ({ isEdit = false, initialData = null, slug = null }) => {
     const initialForm = {

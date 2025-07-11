@@ -1,7 +1,5 @@
 import { Inter } from 'next/font/google';
 import '@/style/globals.css';
-import '@/style/Event.css'
-import '@/style/MyPage.css';
 import Head from 'next/head';
 import BootstrapClient from '@/components/BootstrapClient';
 import Navbar from '@/components/Navbar';
