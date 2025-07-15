@@ -4,14 +4,17 @@ import Maintenance from '@/components/Maintenance';
 
 export const metadata = {
   title: 'Muchitsujo Event',
+  description: 'Gabut? Bingung weekend mau ke mana? semua event seru ada di sini.',
+  keywords: ['event', 'konser', 'cosplay', 'idoru', 'muchitsujo'],
+  authors: [{ name: 'Muchitsujo Team' }],
   openGraph: {
     title: 'Muchitsujo Event',
-    description: 'Temukan event menarik yang akan datang di Muchitsujo Event',
-    url: 'https://www.muchitsujo.site/',
+    description: 'Gabut? Bingung weekend mau ke mana? semua event seru ada di sini.',
+    url: 'https://muchitsujo.site',
     type: 'website',
     images: [
       {
-        url: 'https://www.muchitsujo.site/assets/logo.svg',
+        url: 'https://muchitsujo.site/assets/Muchitsujo.png',
         width: 1200,
         height: 630,
         alt: 'Muchitsujo Event',
@@ -21,12 +24,16 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Muchitsujo Event',
-    description: 'Temukan event menarik yang akan datang di Muchitsujo Event',
-    images: ['https://www.muchitsujo.site/assets/logo.svg'],
-  }
+    description: 'Gabut? Bingung weekend mau ke mana? semua event seru ada di sini.',
+    images: ['https://muchitsujo.site/assets/Muchitsujo.png'],
+  },
+  icons: {
+    icon: '/assets/Muchitsujo.png',
+  },
+  metadataBase: new URL('https://muchitsujo.site'),
 };
-export default async function Home() {
 
+export default async function Home() {
   let events = [];
 
   try {
@@ -34,12 +41,11 @@ export default async function Home() {
     events = res.data;
   } catch (error) {
     console.error('Gagal mengambil data events:', error.message);
-    // Bisa juga tampilkan fallback UI di sini
   }
 
   return (
     <main>
-      {/* <Maintenance/> */}
+      {/* <Maintenance /> */}
       <EventList events={events} />
     </main>
   );

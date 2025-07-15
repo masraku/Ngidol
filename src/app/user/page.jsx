@@ -14,7 +14,7 @@ export const metadata = {
     type: 'website',
     images: [
       {
-        url: 'https://muchitsujo.site/assets/muchit.svg',
+        url: 'https://muchitsujo.site/assets/Muchitsujo.png',
         width: 1200,
         height: 630,
         alt: 'Muchitsujo Event',
@@ -25,10 +25,10 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Muchitsujo Event',
     description: 'Gabut? Bingung weekend mau ke mana? semua event seru ada di sini.',
-    images: ['https://muchitsujo.site/assets/muchit.svg'],
+    images: ['https://muchitsujo.site/assets/Muchitsujo.png'],
   },
   icons: {
-    icon: '/assets/muchit.svg',
+    icon: '/assets/Muchitsujo.png',
   },
   metadataBase: new URL('https://muchitsujo.site'),
 };
