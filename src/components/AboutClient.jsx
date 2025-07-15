@@ -6,8 +6,8 @@ const galleryImages = [
   {
     id: 1,
     src: "/assets/1.jpg",
-    alt: "Event JKT48 Performance",
-    caption: "JKT48 Live Performance"
+    alt: "Tentang Kami",
+    caption: "Komunitas Muchitsujo"
   },
   {
     id: 2,
@@ -25,7 +25,7 @@ const galleryImages = [
     id: 4,
     src: "/assets/4.jpeg",
     alt: "Concert Event",
-    caption: "Major Concert Event"
+    caption: "Concert Event"
   },
   {
     id: 5,
@@ -36,8 +36,8 @@ const galleryImages = [
   {
     id: 6,
     src: "/assets/6.jpeg",
-    alt: "Workshop Event",
-    caption: "Dancing Workshop"
+    alt: "Galeri Event",
+    caption: "Galeri Event"
   }
 ];
 

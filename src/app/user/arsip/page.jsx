@@ -13,7 +13,7 @@ export default function ArsipEvent() {
     const fetchEvents = async () => {
       try {
         const res = await axios.get('/api/event/arsip');
-        setEvents(res.data); // Asumsikan sudah diarsip dari backend
+        setEvents(res.data);
       } catch (err) {
         console.error('Gagal fetch event:', err);
       } finally {
