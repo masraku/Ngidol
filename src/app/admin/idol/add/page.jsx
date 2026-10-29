@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 
 export default function AddIdolPage() {
   const router = useRouter();
-  const [idol, setIdol] = useState({ name: '', description: '', sosmeds: [''] });
+  const [idol, setIdol] = useState({ name: '', description: '', imageUrl: '', sosmeds: [''] });
   const [imageFile, setImageFile] = useState(null);
   const [members, setMembers] = useState([]);
   const [songs, setSongs] = useState([]);
@@ -88,6 +88,7 @@ export default function AddIdolPage() {
       formData.append('name', idol.name);
       formData.append('slug', slugify(idol.name, { lower: true }));
       formData.append('description', idol.description);
+      formData.append('imageUrl', idol.imageUrl);
       formData.append('sosmeds', JSON.stringify(idol.sosmeds));
       formData.append('categoryId', selectedCategoryId);
 
@@ -173,6 +174,18 @@ export default function AddIdolPage() {
           </div>
 
           <div>
+            <label className="label">URL Foto Idol dari Scanner</label>
+            <input
+              name="imageUrl"
+              type="url"
+              value={idol.imageUrl}
+              onChange={handleIdolChange}
+              className="input"
+              placeholder="https://.../poster-atau-profile.jpg"
+            />
+          </div>
+
+          <div>
             <label className="label">Link Sosial Media</label>
             {idol.sosmeds.map((link, index) => (
               <input
@@ -206,6 +219,8 @@ export default function AddIdolPage() {
           >
             {imageFile ? (
               <img src={URL.createObjectURL(imageFile)} alt="Preview" />
+            ) : idol.imageUrl ? (
+              <img src={idol.imageUrl} alt="Preview URL" />
             ) : (
               <div className="dropzone-placeholder">
                 <Upload className="mx-auto mb-2 w-6 h-6" />
@@ -245,6 +260,12 @@ export default function AddIdolPage() {
                 placeholder="X / Twitter"
                 value={member.X}
                 onChange={(e) => handleMemberChange(i, 'X', e.target.value)}
+                className="input"
+              />
+              <input
+                placeholder="URL Foto Member dari Scanner"
+                value={member.image}
+                onChange={(e) => handleMemberChange(i, 'image', e.target.value)}
                 className="input"
               />
             </div>

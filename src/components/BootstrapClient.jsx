@@ -4,11 +4,9 @@ import { useEffect } from 'react';
 
 export default function BootstrapClient() {
   useEffect(() => {
-    // Import Bootstrap CSS dan JS di sisi klien
-    import('bootstrap/dist/css/bootstrap.min.css');
+    // Bootstrap JS dibutuhkan untuk navbar collapse/dropdown di client.
     import('bootstrap/dist/js/bootstrap.bundle.min.js');
   }, []);
 
   return null;
 }
-

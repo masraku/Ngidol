@@ -1,15 +1,13 @@
-import axios from 'axios';
-import EventList from '@/components/EventList';
-import Maintenance from '@/components/Maintenance';
+import CommunityHome from '@/components/CommunityHome';
 
 export const metadata = {
-  title: 'Muchitsujo Event',
-  description: 'Gabut? Bingung weekend mau ke mana? semua event seru ada di sini.',
+  title: 'Muchitsujo - Komunitas Idol & Event',
+  description: 'Komunitas idol dengan jadwal event, kegiatan komunitas, chant, dan database idoru.',
   keywords: ['event', 'konser', 'cosplay', 'idoru', 'muchitsujo'],
   authors: [{ name: 'Muchitsujo Team' }],
   openGraph: {
-    title: 'Muchitsujo Event',
-    description: 'Gabut? Bingung weekend mau ke mana? semua event seru ada di sini.',
+    title: 'Muchitsujo - Komunitas Idol & Event',
+    description: 'Komunitas idol dengan jadwal event, kegiatan komunitas, chant, dan database idoru.',
     url: 'https://muchitsujo.site',
     type: 'website',
     images: [
@@ -23,8 +21,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Muchitsujo Event',
-    description: 'Gabut? Bingung weekend mau ke mana? semua event seru ada di sini.',
+    title: 'Muchitsujo - Komunitas Idol & Event',
+    description: 'Komunitas idol dengan jadwal event, kegiatan komunitas, chant, dan database idoru.',
     images: ['https://muchitsujo.site/assets/Muchitsujo.png'],
   },
   icons: {
@@ -33,20 +31,6 @@ export const metadata = {
   metadataBase: new URL('https://muchitsujo.site'),
 };
 
-export default async function Home() {
-  let events = [];
-
-  try {
-    const res = await axios.get(`/api/event`);
-    events = res.data;
-  } catch (error) {
-    console.error('Gagal mengambil data events:', error.message);
-  }
-
-  return (
-    <main>
-      {/* <Maintenance /> */}
-      <EventList events={events} />
-    </main>
-  );
+export default function Home() {
+  return <CommunityHome />;
 }

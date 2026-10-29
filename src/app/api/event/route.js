@@ -4,6 +4,8 @@ import prisma from '@/lib/prisma';
 import { supabaseServerClient as supabase } from '@/lib/supabase'; // ✅ pakai server-side supabase
 import { createNotification } from '@/lib/notification';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req) {
   try {
     const formData = await req.formData();
@@ -17,11 +19,13 @@ export async function POST(req) {
     const categoryName = formData.get('category');
     const dateRaw = formData.get('date');
     const guestRaw = formData.get('guest');
+    const photoUrlsRaw = formData.get('photoUrls');
     const photos = formData.getAll('photos');
 
     // Parse array field
     const dates = JSON.parse(dateRaw);
     const guests = JSON.parse(guestRaw);
+    const photoUrls = photoUrlsRaw ? JSON.parse(photoUrlsRaw) : [];
 
     // Ambil ID kategori
     let categoryId = null;
@@ -33,8 +37,9 @@ export async function POST(req) {
     }
 
     // Upload photos ke Supabase
-    const uploadedPhotos = [];
+    const uploadedPhotos = Array.isArray(photoUrls) ? photoUrls.filter(Boolean) : [];
     for (const photo of photos) {
+      if (!photo || typeof photo !== 'object' || photo.size === 0) continue;
       const buffer = Buffer.from(await photo.arrayBuffer());
       const filename = `event/${Date.now()}-${uuidv4()}`;
       const { error } = await supabase.storage
@@ -125,4 +130,3 @@ export async function GET(req) {
     }, { status: 500 });
   }
 }
-

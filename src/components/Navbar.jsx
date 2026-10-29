@@ -3,11 +3,12 @@
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/app/user/context/AuthContext';
-import { Navbar, Container, Nav, Button, NavDropdown } from 'react-bootstrap';
+import { Navbar, Container, Nav, NavDropdown } from 'react-bootstrap';
 import Image from 'next/image';
 
 export default function NavbarComponent() {
-  const { user, setUser } = useAuth();
+  const auth = useAuth() || {};
+  const { user, setUser } = auth;
   const router = useRouter();
   const pathname = usePathname();
 
@@ -17,43 +18,58 @@ export default function NavbarComponent() {
       credentials: 'include',
     });
     if (res.ok) {
-      setUser(null);
+      setUser?.(null);
       router.push('/user');
     }
   };
 
-  const isActive = (path) => pathname === path;
+  const isActive = (path, exact = false) => (
+    exact ? pathname === path : pathname === path || pathname.startsWith(`${path}/`)
+  );
 
   return (
     <Navbar
-      variant='dark'
+      variant="light"
       expand="lg"
-      fixed='top'
-      className='shadow-sm'
-      style={{ backgroundColor: '#431006' }}
+      sticky="top"
+      collapseOnSelect
+      className="community-navbar"
     >
-      <Container fluid className="px-2 px-lg-4">
-        <Navbar.Brand as={Link} href="/user" className="py-0">
+      <Container fluid className="community-navbar__inner">
+        <Navbar.Brand as={Link} href="/user" className="community-brand">
           <Image
             src="/assets/muchit.svg"
-            alt="Logo"
-            width={120}
-            height={60}
-            className="d-inline-block align-top"
+            alt="Muchitsujo"
+            width={78}
+            height={36}
             priority
-            style={{ maxWidth: '120px', height: 'auto' }}
           />
+          <span>Community</span>
         </Navbar.Brand>
 
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="ms-auto align-items-center">
+        <Navbar.Toggle aria-controls="community-navbar-nav" />
+        <Navbar.Collapse id="community-navbar-nav">
+          <Nav className="ms-auto align-items-lg-center community-nav-links">
             <Nav.Link
               as={Link}
               href="/user"
-              className={`nav-link-custom ${isActive('/user') ? 'active-link' : ''}`}
+              className={`nav-link-custom ${isActive('/user', true) ? 'active-link' : ''}`}
             >
               Beranda
+            </Nav.Link>
+            <Nav.Link
+              as={Link}
+              href="/user#jadwal"
+              className="nav-link-custom"
+            >
+              Jadwal
+            </Nav.Link>
+            <Nav.Link
+              as={Link}
+              href="/user#kegiatan"
+              className="nav-link-custom"
+            >
+              Kegiatan
             </Nav.Link>
             <Nav.Link
               as={Link}
@@ -67,7 +83,7 @@ export default function NavbarComponent() {
               href="/user/about"
               className={`nav-link-custom ${isActive('/user/about') ? 'active-link' : ''}`}
             >
-              Tentang Kami
+              Tentang
             </Nav.Link>
             <Nav.Link
               as={Link}
@@ -89,7 +105,7 @@ export default function NavbarComponent() {
                 title={`Hai, ${user.name}`}
                 id="user-nav-dropdown"
                 align="end"
-                className="nav-link-custom"
+                className="community-user-menu"
               >
                 <NavDropdown.Item as={Link} href="/user/mypage">
                   My Page
@@ -103,7 +119,7 @@ export default function NavbarComponent() {
               <Nav.Link
                 as={Link}
                 href="/user/auth"
-                className={`nav-link-custom ${isActive('/user/auth') ? 'active-link' : ''}`}
+                className={`community-login-link ${isActive('/user/auth') ? 'active-link' : ''}`}
               >
                 Login
               </Nav.Link>

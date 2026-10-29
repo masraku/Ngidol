@@ -16,6 +16,7 @@ const EventForm = ({ isEdit = false, initialData = null, slug = null }) => {
         category: '',
         htm: '',
         photos: [],
+        photoUrls: '',
     };
 
     const [categories, setCategories] = useState([]);
@@ -49,10 +50,11 @@ const EventForm = ({ isEdit = false, initialData = null, slug = null }) => {
                         time: initialData.time || '',
                         location: initialData.location || '',
                         link: initialData.link || '',
-                        guest: initialData.guest || [],
-                        category: initialData.category || '',
+                        guest: initialData.guests || initialData.guest || [],
+                        category: initialData.category?.name || initialData.category || '',
                         htm: initialData.htm || '',
                         photos: [],
+                        photoUrls: initialData.photos?.join('\n') || '',
                     });
                     setSelectedDates(initialData.date || []);
                 }
@@ -139,6 +141,15 @@ const EventForm = ({ isEdit = false, initialData = null, slug = null }) => {
             formData.append('guest', JSON.stringify(form.guest));
             formData.append('category', form.category);
             formData.append('htm', form.htm);
+            formData.append(
+                'photoUrls',
+                JSON.stringify(
+                    form.photoUrls
+                        .split('\n')
+                        .map((url) => url.trim())
+                        .filter(Boolean)
+                )
+            );
             form.photos.forEach((file) => {
                 formData.append('photos', file);
             });
@@ -467,6 +478,23 @@ const EventForm = ({ isEdit = false, initialData = null, slug = null }) => {
                                 />
                                 <div className="form-text text-muted">
                                     Format: JPG, PNG, atau GIF. Maksimal ukuran 5MB per foto.
+                                </div>
+                            </div>
+
+                            <div className="mb-5">
+                                <label className="form-label label-custom">
+                                    URL Poster dari Scanner
+                                </label>
+                                <textarea
+                                    name="photoUrls"
+                                    value={form.photoUrls}
+                                    onChange={handleChange}
+                                    className="form-control form-control-custom"
+                                    rows={3}
+                                    placeholder="https://.../poster.jpg\nhttps://.../flyer.jpg"
+                                />
+                                <div className="form-text text-muted">
+                                    Opsional. Satu URL per baris agar hasil scan tidak perlu didownload manual.
                                 </div>
                             </div>
 

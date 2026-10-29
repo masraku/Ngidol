@@ -55,6 +55,7 @@ export async function PUT(req, { params }) {
     const dateRaw = formData.get('date');
     const categoryName = formData.get('category')?.toString();
     const guestsRaw = formData.get('guest');
+    const photoUrlsRaw = formData.get('photoUrls');
     const photos = formData.getAll('photos');
 
     if (!name || !time || !location || !htm || !dateRaw || !categoryName) {
@@ -90,8 +91,10 @@ export async function PUT(req, { params }) {
       };
     }
 
-    // Upload photo baru
-    const uploadedPhotos = [];
+    const photoUrls = photoUrlsRaw ? JSON.parse(photoUrlsRaw) : [];
+
+    // Upload photo baru atau pakai URL hasil scanner.
+    const uploadedPhotos = Array.isArray(photoUrls) ? photoUrls.filter(Boolean) : [];
     for (const photo of photos) {
       if (photo && photo.size > 0 && photo.type.startsWith('image/')) {
         const buffer = Buffer.from(await photo.arrayBuffer());

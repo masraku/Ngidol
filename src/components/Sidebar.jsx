@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, Users, Calendar, Settings, Plus, LogOut } from 'lucide-react';
+import { Home, Users, Calendar, Settings, Plus, LogOut, Bot } from 'lucide-react';
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -78,6 +78,15 @@ const Sidebar = () => {
               Daftar Event
             </Link>
           </div>
+        </div>
+
+        <div className="nav-item">
+          <Link href="/admin/automation" className={`nav-button ${isActive('/admin/automation') ? 'active' : ''}`}>
+            <div className="nav-button-content">
+              <Bot className="nav-icon" />
+              Otomasi Data
+            </div>
+          </Link>
         </div>
 
         {/* Settings */}

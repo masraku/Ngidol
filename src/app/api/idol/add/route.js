@@ -15,6 +15,7 @@ export async function POST(req) {
     const slug = formData.get('slug')?.toString();
     const description = formData.get('description')?.toString();
     const imageFile = formData.get('image');
+    const imageUrl = formData.get('imageUrl')?.toString().trim();
     const sosmedsRaw = formData.get('sosmeds')?.toString();
     const categoryIdRaw = formData.get('categoryId')?.toString();
 
@@ -23,7 +24,8 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Kategori wajib dipilih' }, { status: 400 });
     }
 
-    if (!name || !slug || !description || !imageFile || typeof imageFile !== 'object') {
+    const hasImageFile = imageFile && typeof imageFile === 'object' && imageFile.size > 0;
+    if (!name || !slug || !description || (!hasImageFile && !imageUrl)) {
       return NextResponse.json({ error: 'Semua field wajib diisi' }, { status: 400 });
     }
 
@@ -50,27 +52,30 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Format member atau lagu tidak valid' }, { status: 400 });
     }
 
-    // Upload Idol Image
-    const idolFileName = `idol/${uuidv4()}-${imageFile.name}`;
-    const idolBuffer = Buffer.from(await imageFile.arrayBuffer());
+    let idolImageUrl = imageUrl || '';
 
-    const { error: idolUploadError } = await supabaseServerClient.storage
-      .from('idol')
-      .upload(idolFileName, idolBuffer, { contentType: imageFile.type });
+    if (hasImageFile) {
+      const idolFileName = `idol/${uuidv4()}-${imageFile.name}`;
+      const idolBuffer = Buffer.from(await imageFile.arrayBuffer());
 
-    if (idolUploadError) {
-      console.error('❌ Upload idol gagal:', idolUploadError.message);
-      return NextResponse.json({ error: 'Gagal upload gambar idol' }, { status: 500 });
+      const { error: idolUploadError } = await supabaseServerClient.storage
+        .from('idol')
+        .upload(idolFileName, idolBuffer, { contentType: imageFile.type });
+
+      if (idolUploadError) {
+        console.error('❌ Upload idol gagal:', idolUploadError.message);
+        return NextResponse.json({ error: 'Gagal upload gambar idol' }, { status: 500 });
+      }
+
+      idolImageUrl = supabaseServerClient.storage
+        .from('idol')
+        .getPublicUrl(idolFileName).data?.publicUrl;
     }
-
-    const idolImageUrl = supabaseServerClient.storage
-      .from('idol')
-      .getPublicUrl(idolFileName).data?.publicUrl;
 
     // Upload member images in parallel
     const uploadedMembers = await Promise.all(
       members.map(async (member, i) => {
-        let image = '';
+        let image = member.image || '';
         const file = formData.get(`memberImage-${i}`);
         if (file && typeof file === 'object') {
           const filename = `member/${uuidv4()}-${file.name}`;

@@ -8,9 +8,6 @@ import {
   Image,
   OverlayTrigger,
   Tooltip,
-  Container,
-  Row,
-  Col,
 } from 'react-bootstrap';
 import {
   Calendar,
@@ -24,17 +21,22 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/app/user/context/AuthContext';
 
 export default function EventCard({ event }) {
-  const { user } = useAuth();
+  const auth = useAuth() || {};
+  const { user } = auth;
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [checking, setChecking] = useState(false);
-  const pathname = usePathname(); // Detect route change
+  const pathname = usePathname();
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return 'TBA';
     const options = { day: 'numeric', month: 'long', year: 'numeric' };
     return date.toLocaleDateString('id-ID', options);
   };
+
+  const eventDates = Array.isArray(event.date) ? event.date : event.date ? [event.date] : [];
+  const eventPhoto = Array.isArray(event.photos) ? event.photos[0] : event.photos;
 
   useEffect(() => {
     if (!user || !event?.id) return;
@@ -47,12 +49,10 @@ export default function EventCard({ event }) {
           cache: 'no-store',
         });
 
-        if (res.ok) {
-          const data = await res.json();
-          setSaved(data.saved);
-        } else {
-        }
-      } catch (err) {
+        if (!res.ok) return;
+        const data = await res.json();
+        setSaved(data.saved);
+      } catch {
       } finally {
         setChecking(false);
       }
@@ -86,136 +86,133 @@ export default function EventCard({ event }) {
   };
 
   return (
-    <Container>
-      <Row>
-        <Col>
-          <Card className="event-showcase-card">
-            <div className="event-header-bar" />
+    <Card className="event-showcase-card community-event-card">
+      <div className="event-header-bar" />
 
-            {/* Gambar Event */}
-            <div className="event-image-container">
-              {event.photos?.[0] ? (
-                <Card.Img
-                  src={event.photos[0]}
-                  alt={event.name}
-                  className="event-showcase-image"
-                />
-              ) : (
-                <div className="event-image-placeholder">
-                  <div className="event-icon-wrapper">📷</div>
-                  <small>No Image</small>
+      <div className="event-image-container">
+        {eventPhoto ? (
+          <Card.Img
+            src={eventPhoto}
+            alt={event.name}
+            className="event-showcase-image"
+          />
+        ) : (
+          <div className="event-image-placeholder">
+            <div className="event-icon-wrapper">IMG</div>
+            <small>No Image</small>
+          </div>
+        )}
+
+        {event.htm && (
+          <div className="event-price-badge">{event.htm}</div>
+        )}
+
+        <div className="event-gradient-overlay" />
+      </div>
+
+      <Card.Body className="event-showcase-body">
+        <div className="event-category-slug">
+          {event.category?.name || 'Tanpa Kategori'}
+        </div>
+
+        <Card.Title className="event-showcase-title">
+          {event.name}
+        </Card.Title>
+
+        <div className="event-details-info">
+          <div className="event-detail-item">
+            <Calendar className="event-detail-icon" />
+            {eventDates.length > 0 ? eventDates.map((date) => formatDate(date)).join(' - ') : 'Tanggal TBA'}
+          </div>
+          <div className="event-detail-item">
+            <Clock className="event-detail-icon" />
+            {event.time || 'Waktu TBA'}
+          </div>
+          <div className="event-detail-item">
+            <GeoAlt className="event-detail-icon" />
+            {event.location || 'Lokasi TBA'}
+          </div>
+        </div>
+
+        {event.guests?.length > 0 && (
+          <div className="event-guest-section">
+            <span className="event-guest-title">Guest Star:</span>
+            <div className="event-guest-avatars">
+              {event.guests.slice(0, 4).map((guest) => (
+                <div key={guest.id || guest.name} className="event-guest-item">
+                  {guest.image ? (
+                    <Image
+                      src={guest.image}
+                      alt={guest.name}
+                      className="event-guest-avatar"
+                    />
+                  ) : (
+                    <div className="event-guest-avatar event-guest-avatar--empty">
+                      {guest.name?.slice(0, 1) || '?'}
+                    </div>
+                  )}
+                  <div className="event-guest-name">{guest.name}</div>
+                </div>
+              ))}
+              {event.guests.length > 4 && (
+                <div className="event-guest-count-badge">
+                  +{event.guests.length - 4}
                 </div>
               )}
-
-              {event.htm && (
-                <div className="event-price-badge">{event.htm}</div>
-              )}
-
-              <div className="event-gradient-overlay" />
             </div>
+          </div>
+        )}
 
-            <Card.Body className="event-showcase-body">
-              <div className="event-category-slug">
-                {event.category?.name || 'Tanpa Kategori'}
-              </div>
+        <div className="event-showcase-actions d-flex justify-content-between align-items-center">
+          <Button
+            as={Link}
+            href={`/user/event/${event.slug}`}
+            className="btn-event-detail"
+          >
+            Lihat Event
+          </Button>
 
-              <Card.Title className="event-showcase-title">
-                {event.name}
-              </Card.Title>
-
-              <div className="event-details-info">
-                <div className="event-detail-item">
-                  <Calendar className="event-detail-icon" />
-                  {event.date.map((d) => formatDate(d)).join(' - ')}
-                </div>
-                <div className="event-detail-item">
-                  <Clock className="event-detail-icon" />
-                  {event.time}
-                </div>
-                <div className="event-detail-item">
-                  <GeoAlt className="event-detail-icon" />
-                  {event.location}
-                </div>
-              </div>
-
-              {/* Guest Star */}
-              {event.guests?.length > 0 && (
-                <div className="event-guest-section">
-                  <span className="event-guest-title">Guest Star:</span>
-                  <div className="event-guest-avatars">
-                    {event.guests.slice(0, 4).map((guest, index) => (
-                      <div key={index} className="event-guest-item">
-                        <Image
-                          src={guest.image}
-                          alt={guest.name}
-                          className="event-guest-avatar"
-                        />
-                        <div className="event-guest-name">{guest.name}</div>
-                      </div>
-                    ))}
-                    {event.guests.length > 4 && (
-                      <div className="event-guest-count-badge">
-                        +{event.guests.length - 4}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Aksi */}
-              <div className="event-showcase-actions d-flex justify-content-between align-items-center">
+          {user?.role === 'user' && (
+            <div className="d-flex gap-2 align-items-center">
+              <OverlayTrigger
+                overlay={
+                  <Tooltip>
+                    {saved ? 'Hapus dari Favorit' : 'Simpan ke Favorit'}
+                  </Tooltip>
+                }
+              >
                 <Button
-                  as={Link}
-                  href={`/user/event/${event.slug}`}
-                  className="btn-event-detail"
+                  variant={saved ? 'success' : 'outline-primary'}
+                  size="sm"
+                  onClick={handleToggleSave}
+                  disabled={saving || checking}
                 >
-                  Lihat Event
+                  {saved ? (
+                    <BookmarkCheck size={18} />
+                  ) : (
+                    <Bookmark size={18} />
+                  )}
                 </Button>
 
-                {user?.role === 'user' && (
-                  <div className="d-flex gap-2 align-items-center">
-                    <OverlayTrigger
-                      overlay={
-                        <Tooltip>
-                          {saved ? 'Hapus dari Favorit' : 'Simpan ke Favorit'}
-                        </Tooltip>
-                      }
-                    >
-                      <Button
-                        variant={saved ? 'success' : 'outline-primary'}
-                        size="sm"
-                        onClick={handleToggleSave}
-                        disabled={saving || checking}
-                      >
-                        {saved ? (
-                          <BookmarkCheck size={18} />
-                        ) : (
-                          <Bookmark size={18} />
-                        )}
-                      </Button>
+              </OverlayTrigger>
 
-                    </OverlayTrigger>
+              <OverlayTrigger
+                overlay={
+                  <Tooltip>
+                    {saved ? 'Event ini disimpan' : 'Belum disimpan'}
+                  </Tooltip>
+                }
+              >
+                <span className="text-muted">
+                  <InfoCircle size={16} />
+                </span>
+              </OverlayTrigger>
+            </div>
+          )}
+        </div>
+      </Card.Body>
 
-                    <OverlayTrigger
-                      overlay={
-                        <Tooltip>
-                          {saved ? 'Event ini disimpan' : 'Belum disimpan'}
-                        </Tooltip>
-                      }
-                    >
-                      <span className="text-muted">
-                        <InfoCircle size={16} />
-                      </span>
-                    </OverlayTrigger>
-                  </div>
-                )}
-              </div>
-            </Card.Body>
-
-            <div className="event-footer-bar" />
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+      <div className="event-footer-bar" />
+    </Card>
   );
 }
