@@ -13,10 +13,10 @@ export async function generateMetadata({ params }) {
       : `${protocol}://${host}/assets/logo.svg`;
 
     return {
-      title: `${event.name} | EventKu`,
+      title: `${event.name} | Muchitsujo`,
       description: `${event.location} - ${event.time}`,
       openGraph: {
-        title: `${event.name} | EventKu`,
+        title: `${event.name} | Muchitsujo`,
         description: `${event.location} - ${event.time}`,
         url: `${protocol}://${host}/event/${params.slug}`,
         type: 'website',
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }) {
       },
       twitter: {
         card: 'summary_large_image',
-        title: `${event.name} | EventKu`,
+        title: `${event.name} | Muchitsujo`,
         description: `${event.location} - ${event.time}`,
         images: [imageUrl],
       },

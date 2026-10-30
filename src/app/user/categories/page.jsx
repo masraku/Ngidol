@@ -1,8 +1,8 @@
 import CategoriesClient from '@/components/CategoriesClient';
 
 export const metadata = {
-  title: 'Kategori Event | EventKu',
-  description: 'Kategori Event di EventKu',
+  title: 'Kategori Event | Muchitsujo',
+  description: 'Kategori Event di Muchitsujo',
 };
 
 export default function CategoriesPage() {
