@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# database dumps — contain user emails and password hashes, never commit
+*.backup
+*.dump
+*.sql
